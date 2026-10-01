@@ -20,13 +20,14 @@
         <li><b>Ventas, despachos a locales y cierre del día</b> con factura en PDF.</li>
         <li><b>Cobros, caja y gastos</b> claros, desde el celular o el computador.</li>
         <li><b>Tu equipo trabajando a la vez</b>, con fotos y copias diarias en la nube.</li>
+        <li><b>Catálogo para tus clientes</b>, reportes de ventas e importación desde Excel.</li>
       </ul>
       <div id="authError" class="error-box ${message ? '' : 'hidden'}">${esc(message)}</div>
       ${cloud ? `<button type="button" class="primary button google-button" id="googleSignIn">${googleMark}<span>Entrar con Google</span></button>` : ''}
-      <button type="button" class="secondary button demo-button" id="startDemo">Probar sin cuenta (demostración)</button>
+      ${cloud ? '' : '<button type="button" class="secondary button demo-button" id="startDemo">Probar sin cuenta (demostración)</button>'}
       ${legal}`));
     $('#googleSignIn')?.addEventListener('click', signIn);
-    $('#startDemo').onclick = startDemo;
+    $('#startDemo')?.addEventListener('click', startDemo);
   }
   async function signIn() {
     const button = $('#googleSignIn'); busy(button, true);

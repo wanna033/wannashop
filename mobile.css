@@ -139,3 +139,8 @@
   .data-table td[colspan] { grid-column: 1 / -1; }
   .qty-cell { width: 100%; }
 }
+@media (max-width: 760px) {
+  .report-toolbar .segmented { width: 100%; overflow-x: auto; flex-wrap: nowrap; }
+  .report-toolbar .segmented button { white-space: nowrap; font-size: 12.5px; padding-inline: 12px; }
+  .report-toolbar > button { width: 100%; }
+}
