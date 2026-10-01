@@ -97,3 +97,9 @@ html, body { background: var(--brand-950); }
 }
 .alert-row { border-bottom-color: rgba(110, 160, 255, .1); }
 .alert-row:hover { background: rgba(31, 124, 255, .1); }
+/* Tabletas: el banner completo, sin que la tarjeta lo tape */
+@media (min-width: 521px) and (max-width: 900px) {
+  .auth-hero { aspect-ratio: 1672 / 941; max-height: none; }
+  .auth-hero img { object-position: center; }
+  .auth-split .auth-card { margin-top: 18px; }
+}
