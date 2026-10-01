@@ -1,0 +1,136 @@
+/* WannaShop en el celular: barra inferior, ventanas a pantalla completa y botones fáciles de tocar. */
+.tab-bar, .cart-fab, .scan-button { display: none; }
+
+@media (max-width: 760px) {
+  html, body { height: 100%; }
+  body { -webkit-tap-highlight-color: transparent; }
+  .shell { grid-template-columns: 1fr; height: 100dvh; }
+  .sidebar { display: none; }
+  .workspace { padding: 0 12px calc(92px + env(safe-area-inset-bottom)); overscroll-behavior-y: contain; }
+
+  /* Encabezado compacto */
+  .topbar { height: auto; min-height: 60px; padding: calc(8px + env(safe-area-inset-top)) 0 8px; gap: 8px; }
+  .page-heading p { display: none; }
+  .page-heading h1 { font-size: 20px; line-height: 1.15; }
+  .top-actions { gap: 6px; }
+  .command-button { min-width: 42px; width: 42px; height: 42px; justify-content: center; }
+  .command-button span:nth-child(2), .command-button kbd { display: none; }
+  .schedule-pill { height: 34px; padding: 0 9px; font-size: 10px; }
+  .round-button { width: 42px; height: 42px; }
+  .context-bar { top: 64px; font-size: 11px; }
+
+  /* Barra de navegación inferior */
+  .tab-bar { position: fixed; z-index: 60; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, 1fr);
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); background: rgba(9, 11, 16, .94); backdrop-filter: blur(24px) saturate(150%);
+    border-top: 1px solid rgba(255, 255, 255, .09); }
+  .tab-bar button { display: grid; justify-items: center; gap: 2px; min-height: 52px; padding: 4px 0; border: 0; border-radius: 14px;
+    background: transparent; color: #8a94a3; font: inherit; font-size: 10.5px; cursor: pointer; }
+  .tab-bar button i { font-style: normal; font-size: 19px; line-height: 1.2; }
+  .tab-bar button.active { color: #fff; background: rgba(255, 255, 255, .07); }
+  .tab-bar .tab-main i { display: grid; place-items: center; width: 40px; height: 30px; border-radius: 11px; color: #0b0d12;
+    background: linear-gradient(145deg, #ffffff, #c9d2df); font-size: 16px; }
+  .tab-bar .tab-main.active { background: transparent; }
+
+  /* Contenido en una columna */
+  .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .dashboard-grid, .business-detail, .sale-layout, .settings-layout, .assistant-layout { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-grid > *, .business-detail > *, .sale-layout > *, .settings-layout > *, .assistant-layout > *, .panel { min-width: 0; }
+  .with-fab .workspace { padding-bottom: calc(160px + env(safe-area-inset-bottom)); }
+  .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .business-grid { grid-template-columns: 1fr; }
+  .business-grid .media-frame, .business-profile .media-frame { height: 112px; min-height: 0; aspect-ratio: auto; }
+  .hero { padding: 18px 16px; }
+  .hero-grid { grid-template-columns: 1fr; }
+  .hero-logo { display: none; }
+  .hero h2 { font-size: 24px; }
+  .hero-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .hero-actions > * { padding-inline: 6px; font-size: 12px; }
+  .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: none; overflow: visible; padding: 10px; }
+  .cart-panel { position: relative; top: auto; scroll-margin-top: 70px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; }
+  .toolbar .search-field, .search-field { min-width: 0; max-width: none; flex: 1 1 100%; }
+  .toolbar .toolbar-spacer { display: none; }
+  .toolbar > button { flex: 1 1 calc(50% - 8px); }
+  .panel-head { padding: 12px 14px; }
+  .panel-head input { width: 100%; }
+
+  /* Tocar fácil y sin zoom automático en iPhone */
+  input, select, textarea { font-size: 16px !important; }
+  button, .button, select, input:not([type=checkbox]):not([type=radio]) { min-height: 44px; }
+  .size-chip { min-width: 46px; height: 40px; font-size: 12px; }
+  .icon-button { min-width: 40px; min-height: 40px; }
+
+  /* Ventanas como hojas que suben desde abajo */
+  .modal { padding: 0; place-items: end stretch; }
+  .modal-panel { width: 100%; max-width: none; max-height: 94dvh; border-radius: 22px 22px 0 0; padding: 20px 14px calc(14px + env(safe-area-inset-bottom));
+    animation: sheetUp .26s cubic-bezier(.2, .8, .2, 1); }
+  .modal-panel.wide { width: 100%; }
+  .modal-panel::before { content: ''; display: block; width: 42px; height: 4px; border-radius: 4px; margin: -8px auto 12px; background: rgba(255, 255, 255, .22); }
+  .modal-close { top: 10px; right: 10px; width: 40px; height: 40px; }
+  .form-grid, .form-grid.three { grid-template-columns: 1fr !important; }
+  .form-grid .span-2 { grid-column: auto; }
+  .form-actions { position: sticky; bottom: calc(-14px - env(safe-area-inset-bottom)); z-index: 2; margin: 18px -14px 0; padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+    background: rgba(17, 21, 29, .98); flex-wrap: wrap; }
+  .form-actions > button, .form-actions > .button { flex: 1 1 auto; }
+  .drawer { width: 100vw; padding: 18px 14px calc(18px + env(safe-area-inset-bottom)); }
+
+  /* Tablas: se desplazan de lado en vez de aplastarse */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .data-table { font-size: 12.5px; }
+  .data-table th, .data-table td { white-space: nowrap; }
+  .qty-cell { width: 70px; }
+
+  .toast-stack { left: 12px; right: 12px; width: auto; bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .palette { padding: calc(10px + env(safe-area-inset-top)) 10px 10px; }
+  .palette-box { width: 100%; }
+
+  /* Botón flotante del carrito en Venta */
+  .cart-fab { position: fixed; z-index: 59; left: 12px; right: 12px; bottom: calc(74px + env(safe-area-inset-bottom)); display: none; align-items: center;
+    justify-content: space-between; gap: 10px; min-height: 52px; padding: 0 18px; border: 0; border-radius: 16px; color: #0b0d12; font: inherit; font-weight: 700;
+    background: linear-gradient(145deg, #ffffff, #cfd8e4); box-shadow: 0 14px 34px rgba(0, 0, 0, .45); cursor: pointer; }
+  .cart-fab.show { display: flex; }
+
+  /* Escáner con la cámara junto a los buscadores */
+  .scan-wrap { display: flex; gap: 8px; align-items: stretch; width: 100%; }
+  .scan-wrap > input { flex: 1; min-width: 0; }
+  .scan-button { display: grid; place-items: center; flex: none; width: 48px; border: 1px solid rgba(255, 255, 255, .14); border-radius: 12px;
+    background: rgba(255, 255, 255, .07); color: #fff; font-size: 20px; cursor: pointer; }
+}
+
+@keyframes sheetUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Visor de la cámara */
+.scanner { position: fixed; z-index: 140; inset: 0; display: grid; grid-template-rows: 1fr auto; background: #000; }
+.scanner video { width: 100%; height: 100%; object-fit: cover; }
+.scanner-frame { position: absolute; left: 50%; top: 42%; width: min(78vw, 360px); height: 160px; transform: translate(-50%, -50%);
+  border: 3px solid rgba(255, 255, 255, .9); border-radius: 18px; box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .45); }
+.scanner-frame::after { content: ''; position: absolute; left: 8%; right: 8%; top: 50%; height: 2px; background: #ff4d4d; animation: scanLine 1.6s ease-in-out infinite alternate; }
+.scanner-bar { display: grid; gap: 10px; padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); background: #0b0d12; color: #e8edf3; text-align: center; }
+.scanner-bar b { font-size: 15px; }
+.scanner-bar small { color: #9aa3b2; }
+.scanner-bar button { min-height: 48px; border: 0; border-radius: 14px; background: #fff; color: #0b0d12; font: inherit; font-weight: 700; }
+@keyframes scanLine { from { transform: translateY(-50px); } to { transform: translateY(50px); } }
+
+/* Menú «Más» */
+.more-label { margin: 16px 0 8px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #8a94a3; }
+.more-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.more-item { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 12px; border: 1px solid rgba(255, 255, 255, .08); border-radius: 14px;
+  background: rgba(255, 255, 255, .04); color: #e8edf3; font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
+.more-item i { font-style: normal; font-size: 17px; width: 22px; text-align: center; color: #b8c2d0; }
+.more-item em { margin-left: auto; font-style: normal; font-size: 11px; padding: 2px 7px; border-radius: 9px; background: #e5484d; color: #fff; }
+.more-item.active { border-color: rgba(255, 255, 255, .3); background: rgba(255, 255, 255, .09); }
+.more-foot { display: grid; gap: 8px; margin-top: 18px; }
+
+/* Tablas dentro de ventanas: en el celular cada fila es una tarjeta con sus títulos */
+@media (max-width: 760px) {
+  .modal .table-wrap { overflow: visible; }
+  .modal .data-table, .modal .data-table tbody { display: block; width: 100%; }
+  .modal .data-table thead { display: none; }
+  .modal .data-table tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; margin-bottom: 8px; padding: 12px;
+    border: 1px solid rgba(255, 255, 255, .09); border-radius: 14px; background: rgba(255, 255, 255, .03); }
+  .modal .data-table td { display: flex; flex-direction: column; gap: 3px; padding: 0; border: 0; white-space: normal; min-width: 0; }
+  .modal .data-table td:first-child { grid-column: 1 / -1; font-size: 14px; }
+  .modal .data-table td[data-label]:not(:first-child)::before { content: attr(data-label); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #8a94a3; }
+  .modal .data-table td:empty { display: none; }
+  .modal .qty-cell { width: 100%; }
+}
