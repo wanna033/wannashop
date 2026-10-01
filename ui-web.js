@@ -7,21 +7,21 @@
 
   const legal = '<p class="auth-legal">Al entrar aceptas los <a href="terminos.html" target="_blank" rel="noopener">Términos de uso</a> y la <a href="privacidad.html" target="_blank" rel="noopener">Política de privacidad</a>.</p>';
   const card = (title, subtitle, body, wide = false) => `<div class="auth-card ${wide ? 'auth-wide' : ''}"><div class="auth-brand"><img src="assets/wannashop-logo.png" alt="Logo WannaShop"><h1>${esc(title)}</h1><p>${esc(subtitle)}</p></div>${body}</div>`;
-  const show = html => { $('#shell').classList.add('hidden'); $('#authRoot').classList.remove('hidden'); $('#authRoot').innerHTML = html; W.hideBoot(); };
+  // Pantalla de entrada: el banner de WannaShop y al lado (abajo en el celular) la tarjeta.
+  const show = html => {
+    $('#shell').classList.add('hidden');
+    const root = $('#authRoot'); root.classList.remove('hidden'); root.classList.add('auth-split');
+    root.innerHTML = `<div class="auth-hero"><img src="assets/login-banner.webp" alt="WannaShop, sistema de inventario: gestiona tu inventario de forma fácil, rápida y organizada"></div><div class="auth-side">${html}</div>`;
+    W.hideBoot();
+  };
   const busy = (button, on) => { if (!button) return; button.disabled = on; button.classList.toggle('loading', on); };
   const fail = (message) => { const box = $('#authError'); if (!box) return; box.textContent = message; box.classList.toggle('hidden', !message); };
 
   // Bienvenida: qué es, entrar con Google o probar sin cuenta.
   function showWelcome(message = '') {
     const cloud = lastStatus.cloudAvailable !== false;
-    show(card('WannaShop', 'Inventario, ventas y despachos para tiendas y bodegas de calzado', `
-      <ul class="welcome-points">
-        <li><b>Cada modelo con todas sus tallas</b> y su código de barras.</li>
-        <li><b>Ventas, despachos a locales y cierre del día</b> con factura en PDF.</li>
-        <li><b>Cobros, caja y gastos</b> claros, desde el celular o el computador.</li>
-        <li><b>Tu equipo trabajando a la vez</b>, con fotos y copias diarias en la nube.</li>
-        <li><b>Catálogo para tus clientes</b>, reportes de ventas e importación desde Excel.</li>
-      </ul>
+    show(card('Bienvenido', 'Sistema de inventario para tu negocio', `
+      <p class="auth-lead">Inventario por tallas, ventas, despachos, cobros y reportes, desde el celular o el computador.</p>
       <div id="authError" class="error-box ${message ? '' : 'hidden'}">${esc(message)}</div>
       ${cloud ? `<button type="button" class="primary button google-button" id="googleSignIn">${googleMark}<span>Entrar con Google</span></button>` : ''}
       ${cloud ? '' : '<button type="button" class="secondary button demo-button" id="startDemo">Probar sin cuenta (demostración)</button>'}
