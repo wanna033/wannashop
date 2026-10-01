@@ -88,18 +88,17 @@ html, body { background: var(--brand-950); }
 .auth-split .auth-brand h1 { color: #fff; }
 .auth-lead { margin: -8px 0 18px; text-align: center; color: #b8c8e6; font-size: 14px; line-height: 1.5; }
 @media (max-width: 900px) {
-  .auth-root.auth-split { grid-template-columns: 1fr; grid-template-rows: auto auto; height: 100%; }
-  .auth-hero { min-height: 0; aspect-ratio: 16 / 10; max-height: 46vh; }
-  .auth-hero img { object-position: left center; }
-  .auth-hero::after { background: linear-gradient(180deg, transparent 62%, #030817); }
-  .auth-side { padding: 0 14px calc(24px + env(safe-area-inset-bottom)); place-items: start center; background: #030817; overflow: visible; }
-  .auth-split .auth-card { margin-top: -28px; position: relative; z-index: 1; }
+  /* Celular y tableta: banner arriba con su propia altura y la tarjeta debajo (la página se desplaza). */
+  .auth-root.auth-split { display: block; height: 100%; overflow: auto; }
+  .auth-hero { min-height: 0; height: auto; }
+  .auth-hero img { position: static; width: 100%; height: auto; }
+  .auth-hero::after { background: linear-gradient(180deg, transparent 70%, #030817); }
+  .auth-side { display: grid; place-items: start center; padding: 0 14px calc(24px + env(safe-area-inset-bottom)); background: #030817; overflow: visible; }
+  .auth-split .auth-card { margin-top: 10px; position: relative; z-index: 1; }
 }
-.alert-row { border-bottom-color: rgba(110, 160, 255, .1); }
-.alert-row:hover { background: rgba(31, 124, 255, .1); }
-/* Tabletas: el banner completo, sin que la tarjeta lo tape */
-@media (min-width: 521px) and (max-width: 900px) {
-  .auth-hero { aspect-ratio: 1672 / 941; max-height: none; }
-  .auth-hero img { object-position: center; }
-  .auth-split .auth-card { margin-top: 18px; }
+@media (max-width: 520px) {
+  /* Celular: el banner se recorta por la izquierda para que el logo y la bienvenida se vean grandes. */
+  .auth-hero { height: min(62vw, 44vh); }
+  .auth-hero img { position: absolute; inset: 0; height: 100%; object-fit: cover; object-position: left center; }
+  .auth-split .auth-card { margin-top: -24px; }
 }
