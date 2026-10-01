@@ -40,11 +40,11 @@
     W.modal(`<h2 id="modalTitle">Más opciones</h2><p class="modal-subtitle">${esc(session.name || '')}${web.email ? ` · ${esc(web.email)}` : ''}</p>${sections.filter(section => section.items.length).map(section => `<p class="more-label">${esc(section.title)}</p><div class="more-grid">${section.items.join('')}</div>`).join('')}<div class="more-foot"><button type="button" class="secondary" data-action="openProtection">☁ ${esc(W.data?.protection?.cloud || 'Datos')}</button>${W.admin() ? '<button type="button" class="secondary" data-action="staff">Usuarios</button>' : ''}<button type="button" class="danger" data-action="logout">Cerrar sesión</button></div>`);
   };
 
-  // Escáner con la cámara (Chrome en Android y otros navegadores con BarcodeDetector).
+  // Escáner con la cámara: Android, iPhone y cualquier navegador con cámara.
   const SCAN_INPUTS = ['#inventorySearch', '#saleSearch', '#countScan', '#dispatchSearch'];
-  const canScan = 'BarcodeDetector' in window && navigator.mediaDevices?.getUserMedia;
+  const canScan = () => Boolean(navigator.mediaDevices?.getUserMedia && window.api?.loadBarcodeDetector);
   function decorate() {
-    if (!canScan) return;
+    if (!canScan()) return;
     for (const selector of SCAN_INPUTS) {
       const input = $(selector);
       if (!input || input.dataset.scanReady) continue;
@@ -57,9 +57,9 @@
       wrap.querySelector('.scan-button').onclick = () => openScanner(input, selector !== '#inventorySearch');
     }
   }
-  // Cada celda de una tabla en ventana recibe el título de su columna (se ve como tarjeta en el celular).
+  // Cada celda de una tabla recibe el título de su columna (en el celular se ve como tarjeta).
   function labelTables() {
-    for (const table of W.$$('.modal .data-table:not([data-labeled])')) {
+    for (const table of W.$$('.data-table:not([data-labeled])')) {
       table.dataset.labeled = '1';
       const titles = [...table.querySelectorAll('thead th')].map(th => th.textContent.trim());
       for (const row of table.querySelectorAll('tbody tr')) [...row.children].forEach((cell, index) => { if (titles[index]) cell.dataset.label = titles[index]; });
@@ -68,11 +68,13 @@
   new MutationObserver(() => { if (phone.matches) { decorate(); labelTables(); } }).observe(document.body, { childList: true, subtree: true });
 
   async function openScanner(input, continuous) {
-    let stream;
+    let stream, Detector;
     try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false }); }
     catch { return W.toast('No se pudo abrir la cámara', 'Permite el acceso a la cámara en el navegador.', 'error'); }
-    const formats = await BarcodeDetector.getSupportedFormats().catch(() => []);
-    const detector = new BarcodeDetector({ formats: ['code_128', 'ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_39', 'qr_code'].filter(format => !formats.length || formats.includes(format)) });
+    try { Detector = await window.api.loadBarcodeDetector(); }
+    catch { stream.getTracks().forEach(track => track.stop()); return W.toast('No se pudo iniciar el lector', 'Revisa tu conexión e intenta de nuevo.', 'error'); }
+    const formats = await Detector.getSupportedFormats().catch(() => []);
+    const detector = new Detector({ formats: ['code_128', 'ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_39', 'qr_code'].filter(format => !formats.length || formats.includes(format)) });
     const overlay = document.createElement('div');
     overlay.className = 'scanner';
     overlay.innerHTML = `<video playsinline muted></video><div class="scanner-frame"></div><div class="scanner-bar"><b id="scanStatus">Apunta al código de barras</b><small>${continuous ? 'Cada lectura se agrega. Pulsa Listo al terminar.' : 'Se buscará apenas lo lea.'}</small><button type="button">Listo</button></div>`;

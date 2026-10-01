@@ -44,6 +44,7 @@
 
   W.webAuth = status => {
     lastStatus = status || {};
+    if (status.demo) W.savedDetail = 'Guardado en este navegador.';
     if (status.member?.active) return enter();
     if (status.user && !status.demo) return status.ownerExists ? showDenied({ email: status.user.email, inactive: Boolean(status.member) }) : showClaim(status.user.email);
     showSignIn();
@@ -74,7 +75,7 @@
   W.actions.staffEdit = (_, data) => staffForm(data);
 
   // Configuración: la protección de datos es la nube, no carpetas del equipo.
-  const cloudPanel = () => { const demo = W.data.web?.demo; return `<div class="panel-head"><div><h2>Datos en la nube</h2><p>${demo ? 'Modo demostración' : 'Cada cambio se guarda en línea al instante'}</p></div></div><div class="panel-body protection-summary"><div class="protection-row"><span class="status-orb ${demo ? 'warn' : ''}"></span><span><b>${demo ? 'Solo en este navegador' : 'Guardado en Google Cloud'}</b><small>${demo ? 'Conecta Firebase para usarla en varios equipos' : 'Entra desde cualquier equipo o celular'}</small></span></div><div class="protection-row"><span class="status-orb ${demo ? 'warn' : ''}"></span><span><b>Fotos en la nube</b><small>${demo ? 'Guardadas en este navegador' : 'Se ven en todos los equipos'}</small></span></div><div class="settings-actions"><button class="secondary" data-action="backupNow">Descargar una copia</button></div></div>`; };
+  const cloudPanel = () => { const demo = W.data.web?.demo; return `<div class="panel-head"><div><h2>Datos en la nube</h2><p>${demo ? 'Modo demostración' : 'Cada cambio se guarda en línea al instante'}</p></div></div><div class="panel-body protection-summary"><div class="protection-row"><span class="status-orb ${demo ? 'warn' : ''}"></span><span><b>${demo ? 'Solo en este navegador' : 'Guardado en Google Cloud'}</b><small>${demo ? 'Conecta Firebase para usarla en varios equipos' : 'Entra desde cualquier equipo o celular'}</small></span></div><div class="protection-row"><span class="status-orb ${demo ? 'warn' : ''}"></span><span><b>Fotos en la nube</b><small>${demo ? 'Guardadas en este navegador' : 'Se ven en todos los equipos'}</small></span></div><div class="protection-row"><span class="status-orb ${demo ? 'warn' : ''}"></span><span><b>Copias diarias</b><small>${demo ? 'Solo en la nube' : 'Se guardan solas, 30 días'}</small></span></div><div class="settings-actions">${demo ? '' : '<button class="secondary" data-action="cloudBackups">Ver copias diarias</button>'}<button class="secondary" data-action="backupNow">Descargar una copia</button></div></div>`; };
   const baseSettings = W.routes.settings;
   W.routes.settings = () => {
     baseSettings();
@@ -86,8 +87,42 @@
     const backup = $('.settings-layout aside [data-action="backupNow"]:not(.protection-summary *)'); if (backup) backup.textContent = 'Descargar respaldo';
     $('input[name="aiKey"]')?.closest('.form-grid')?.insertAdjacentHTML('afterend', '<p class="field-hint">En la web, la clave se guarda solo en este navegador: en cada equipo se escribe una vez.</p>');
   };
-  W.actions.openProtection = () => W.modal(`<h2 id="modalTitle">Datos en la nube</h2><p class="modal-subtitle">${W.data.web?.demo ? 'En el modo demostración todo queda en este navegador.' : 'Cada cambio se guarda en Google Cloud y se ve al instante en los demás equipos. Puedes descargar una copia completa cuando quieras.'}</p><div class="form-actions"><button class="secondary" data-action="closeModal">Cerrar</button><button class="primary" data-action="backupNow">Descargar copia</button></div>`);
+  // Copias diarias automáticas en la nube (las últimas 30).
+  W.actions.cloudBackups = async () => {
+    try {
+      const list = await window.api.cloudBackups(W.token);
+      W.modal(`<h2 id="modalTitle">Copias diarias en la nube</h2><p class="modal-subtitle">Cada día, el primer guardado deja una copia completa del día anterior. Se conservan las últimas 30. Restaurar reemplaza los datos actuales por los de esa copia (queda registrado).</p>${list.length ? `<div class="table-wrap"><table class="data-table"><thead><tr><th>Copia del</th><th>Modelos</th><th>Revisión</th><th></th></tr></thead><tbody>${list.map(item => `<tr><td><b>${esc(item.day)}</b></td><td>${item.products}</td><td>#${item.revision}</td><td><button class="secondary" data-action="restoreCloudBackup" data-day="${esc(item.day)}">Restaurar</button></td></tr>`).join('')}</tbody></table></div>` : W.empty('☁', 'Todavía no hay copias', 'La primera se crea mañana, con el primer movimiento del día.')}<div class="form-actions"><button class="secondary" data-action="closeModal">Cerrar</button><button class="primary" data-action="backupNow">Descargar copia ahora</button></div>`, { wide: true });
+    } catch (error) { W.toast('No se pudieron ver las copias', W.cleanError(error), 'error'); }
+  };
+  W.actions.restoreCloudBackup = async (_, data) => {
+    const ok = await W.confirm({ title: `Restaurar la copia del ${data.day}`, message: 'Los datos actuales se reemplazarán por los de esa copia en todos los equipos. Antes, descarga una copia de hoy por si acaso.', confirmText: 'Restaurar', danger: true });
+    if (!ok) return;
+    try { const result = await window.api.restoreCloudBackup(W.token, data.day); W.data = result.data; W.closeModal(); W.render('dashboard'); W.toast('Copia restaurada', `Los datos quedaron como el ${data.day}.`); }
+    catch (error) { W.toast('No se pudo restaurar', W.cleanError(error), 'error'); }
+  };
+  W.actions.openProtection = () => W.modal(`<h2 id="modalTitle">Datos en la nube</h2><p class="modal-subtitle">${W.data.web?.demo ? 'En el modo demostración todo queda en este navegador.' : 'Cada cambio se guarda en Google Cloud y se ve al instante en los demás equipos. Puedes descargar una copia completa cuando quieras.'}</p><div class="form-actions"><button class="secondary" data-action="closeModal">Cerrar</button>${!W.data.web?.demo && W.admin() ? '<button class="secondary" data-action="cloudBackups">Copias diarias</button>' : ''}<button class="primary" data-action="backupNow">Descargar copia</button></div>`);
   W.actions.chooseBackupFolder = W.actions.openProtection;
+
+  // Avisos fijos arriba: sin internet y versión nueva disponible.
+  document.body.insertAdjacentHTML('beforeend', '<div id="netBanner" class="web-banner warn hidden" role="status">Sin internet · puedes consultar, pero para guardar necesitas conexión.</div><div id="updateBanner" class="web-banner hidden" role="status"><span>Hay una versión nueva de WannaShop.</span><button type="button" id="updateNow">Actualizar</button></div>');
+  const syncNet = () => $('#netBanner').classList.toggle('hidden', navigator.onLine !== false);
+  window.addEventListener('online', () => { syncNet(); if (W.data) W.toast('Conexión recuperada', 'Ya puedes guardar de nuevo.'); });
+  window.addEventListener('offline', syncNet);
+  syncNet();
+  const build = document.querySelector('meta[name="ws-build"]')?.content;
+  async function checkUpdate() {
+    if (!build || document.visibilityState === 'hidden') return;
+    try { const latest = await (await fetch(`version.json?t=${Date.now()}`, { cache: 'no-store' })).json(); if (latest.build && latest.build !== build) $('#updateBanner').classList.remove('hidden'); } catch {}
+  }
+  $('#updateNow').onclick = () => location.reload();
+  document.addEventListener('visibilitychange', checkUpdate);
+  setInterval(checkUpdate, 10 * 60 * 1000);
+  W.savedDetail = 'Guardado en la nube.';
+
+  // Ningún error queda en silencio: se muestra en lenguaje claro.
+  const report = error => { const message = W.cleanError(error); if (!message || /ResizeObserver|Script error/i.test(message)) return; W.toast('Algo no salió bien', message, 'error'); };
+  window.addEventListener('unhandledrejection', event => report(event.reason));
+  window.addEventListener('error', event => { if (event.error) report(event.error); });
 
   // Cambios hechos desde otro equipo: se recargan sin interrumpir lo que se está escribiendo.
   window.addEventListener('ws-remote-change', async () => {

@@ -72,7 +72,7 @@
         const message=WS.cleanError(error);
         if(/bodega está cerrada/i.test(message)&&WS.admin()&&!options.noOverride){const reason=await WS.prompt({title:'Autorizar fuera de horario',message:'Esta excepción quedará registrada con tu usuario.',label:'Motivo de la excepción',placeholder:'Ej. inventario urgente autorizado'});if(!reason)throw error;response=await window.api.command(WS.token,{...command,overrideSchedule:true,overrideReason:reason})}else throw error;
       }
-      WS.data=response.data;WS.syncChrome();if(response.backup?.ok===false)WS.toast('Movimiento guardado, respaldo incompleto','Abre Protección para revisar la segunda copia.','warning',true);else WS.toast(options.success||'Operación guardada',options.detail||'Copia automática verificada.');return response.result;
+      WS.data=response.data;WS.syncChrome();if(response.backup?.ok===false)WS.toast('Movimiento guardado, respaldo incompleto','Abre Protección para revisar la segunda copia.','warning',true);else WS.toast(options.success||'Operación guardada',options.detail||WS.savedDetail||'Copia automática verificada.');return response.result;
     }catch(error){const message=WS.cleanError(error);if(/información cambió/i.test(message))await WS.reload();WS.toast('No se pudo completar',message,'error',true);return null}finally{WS.commandBusy=false}
   };
 
