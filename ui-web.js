@@ -25,6 +25,7 @@
       <div id="authError" class="error-box ${message ? '' : 'hidden'}">${esc(message)}</div>
       ${cloud ? `<button type="button" class="primary button google-button" id="googleSignIn">${googleMark}<span>Entrar con Google</span></button>` : ''}
       ${cloud ? '' : '<button type="button" class="secondary button demo-button" id="startDemo">Probar sin cuenta (demostración)</button>'}
+      <p class="auth-legal"><a href="ayuda.html" target="_blank" rel="noopener">¿Cómo funciona? Lee la guía paso a paso</a></p>
       ${legal}`));
     $('#googleSignIn')?.addEventListener('click', signIn);
     $('#startDemo')?.addEventListener('click', startDemo);
@@ -101,7 +102,7 @@
   W.actions.createRealBusiness = async () => { W.closeModal(); try { await window.api.logout(W.token); } catch {} W.data = null; lastStatus = { cloudAvailable: true }; showWelcome(); setTimeout(() => $('#googleSignIn')?.click(), 50); };
   W.actions.userMenu = () => {
     const admin = W.admin(), web = W.data.web || {};
-    W.modal(`<h2 id="modalTitle">${esc(W.data.session.name)}</h2><p class="modal-subtitle">${esc(web.email || '')} · ${admin ? 'Administrador' : 'Operador'}${web.business ? ` · ${esc(web.business.name)}` : ''}</p><div class="form-actions">${web.demo ? (web.cloudAvailable ? '<button class="primary" data-action="createRealBusiness">Crear mi negocio real</button>' : '') : '<button class="secondary" data-action="switchBusiness">Cambiar de negocio</button>'}${admin && !web.demo ? '<button class="secondary" data-action="staff">Equipo</button>' : ''}<button class="secondary" data-action="quickGuide">Guía rápida</button><button class="danger" data-action="logout">${web.demo ? 'Salir de la demostración' : 'Cerrar sesión'}</button></div>`);
+    W.modal(`<h2 id="modalTitle">${esc(W.data.session.name)}</h2><p class="modal-subtitle">${esc(web.email || '')} · ${admin ? 'Administrador' : 'Operador'}${web.business ? ` · ${esc(web.business.name)}` : ''}</p><div class="form-actions">${web.demo ? (web.cloudAvailable ? '<button class="primary" data-action="createRealBusiness">Crear mi negocio real</button>' : '') : '<button class="secondary" data-action="switchBusiness">Cambiar de negocio</button>'}${admin && !web.demo ? '<button class="secondary" data-action="staff">Equipo</button>' : ''}<button class="secondary" data-action="tutorials">Tutoriales</button><button class="danger" data-action="logout">${web.demo ? 'Salir de la demostración' : 'Cerrar sesión'}</button></div>`);
   };
 
   // El negocio abierto se ve junto al nombre de la persona.
@@ -145,7 +146,9 @@
     const data = W.data; if (!data || data.web?.demo) return '';
     let hidden = false; try { hidden = localStorage.getItem(`wannashop.onboarding.${data.web?.business?.id}`) === 'done'; } catch {}
     if (hidden || !W.admin()) return '';
+    let toured = false; try { toured = Boolean(JSON.parse(localStorage.getItem('wannashop.tutorial') || '{}').basics); } catch {}
     const steps = [
+      ['Mira el tutorial (5 minutos)', toured, '', 'tutorials'],
       ['Pon los datos de tu negocio', Boolean(data.settings?.storeName && (data.settings.phone || data.settings.nit || data.settings.address)), 'settings', ''],
       ['Crea tu primer modelo con sus tallas', (data.products || []).length > 0, '', 'newProduct'],
       ['Haz tu primera venta', (data.sales || []).length > 0, 'sale', ''],
@@ -162,7 +165,7 @@
     const app = $('#app');
     if (W.data.web?.demo) app.insertAdjacentHTML('afterbegin', `<div class="demo-strip"><span><b>Estás en la demostración.</b> Los datos son de ejemplo y quedan solo en este navegador.</span>${W.data.web.cloudAvailable ? '<button class="primary" data-action="createRealBusiness">Crear mi negocio gratis</button>' : ''}</div>`);
     else app.insertAdjacentHTML('afterbegin', onboarding());
-    if (W.ui.welcomeNew) { W.ui.welcomeNew = false; W.actions.quickGuide(); }
+    if (W.ui.welcomeNew) { W.ui.welcomeNew = false; (W.actions.tutorials || W.actions.quickGuide)(); }
   };
 
   // Configuración: la protección de datos es la nube, no carpetas del equipo.
