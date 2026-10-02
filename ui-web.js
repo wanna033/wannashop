@@ -18,17 +18,19 @@
   const fail = (message) => { const box = $('#authError'); if (!box) return; box.textContent = message; box.classList.toggle('hidden', !message); };
 
   // Bienvenida: qué es, entrar con Google o probar sin cuenta.
-  function showWelcome(message = '') {
+  function showWelcome(message = '', retryable = false) {
     const cloud = lastStatus.cloudAvailable !== false;
     show(card('Bienvenido', 'Sistema de inventario para tu negocio', `
       <p class="auth-lead">Inventario por tallas, ventas, despachos, cobros y reportes, desde el celular o el computador.</p>
       <div id="authError" class="error-box ${message ? '' : 'hidden'}">${esc(message)}</div>
+      ${retryable ? '<button type="button" class="secondary button" id="retryStartup">Volver a cargar WannaShop</button>' : ''}
       ${cloud ? `<button type="button" class="primary button google-button" id="googleSignIn">${googleMark}<span>Entrar con Google</span></button>` : ''}
       ${cloud ? '' : '<button type="button" class="secondary button demo-button" id="startDemo">Probar sin cuenta (demostración)</button>'}
       <p class="auth-legal"><a href="ayuda.html" target="_blank" rel="noopener">¿Cómo funciona? Lee la guía paso a paso</a></p>
       ${legal}`));
     $('#googleSignIn')?.addEventListener('click', signIn);
     $('#startDemo')?.addEventListener('click', startDemo);
+    $('#retryStartup')?.addEventListener('click', () => location.reload());
   }
   async function signIn() {
     const button = $('#googleSignIn'); busy(button, true);
@@ -88,10 +90,119 @@
   W.webAuth = status => {
     lastStatus = status || {};
     W.savedDetail = status.demo ? 'Guardado en este navegador.' : 'Guardado en la nube.';
+    if (status.error) return showWelcome(status.error, status.retryable);
     if (status.ok) return enter();
     if (status.choose) return showChooser(status.choose, status.email);
     if (status.create) return showCreate(status.email, status.name);
     showWelcome();
+  };
+
+  // Herramientas web de inventario: búsqueda, categoría, estado, resumen y exportación por modelo.
+  const baseInventory = W.routes.inventory;
+  W.routes.inventory = () => {
+    baseInventory();
+    const input = $('#inventorySearch'), results = $('#inventoryResults'), toolbar = $('#app .toolbar');
+    if (!input || !results || !toolbar) return;
+    const filters = [['all', 'Todos'], ['available', 'Con stock'], ['low', 'Por reponer'], ['out', 'Agotados']];
+    const allowedFilters = filters.map(([key]) => key), allowedSorts = ['model', 'stock-desc', 'stock-asc'];
+    let selectedFilter = allowedFilters.includes(W.ui.inventoryWebFilter) ? W.ui.inventoryWebFilter : 'all';
+    let selectedSort = allowedSorts.includes(W.ui.inventoryWebSort) ? W.ui.inventoryWebSort : 'model';
+    const categories = [...new Set(W.groups().map(group => String(group.category || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    let selectedCategory = categories.includes(W.ui.inventoryWebCategory) ? W.ui.inventoryWebCategory : 'all';
+    const controls = document.createElement('section');
+    controls.className = 'inventory-suite';
+    controls.innerHTML = `<div class="inventory-summary" aria-label="Resumen de existencias">
+      <article class="inventory-metric"><small>MODELOS</small><strong data-inventory-metric="models">0</strong><span>en esta selección</span></article>
+      <article class="inventory-metric"><small>PARES EN BODEGA</small><strong data-inventory-metric="pairs">0</strong><span>disponibles ahora</span></article>
+      <article class="inventory-metric warn"><small>TALLAS POR REPONER</small><strong data-inventory-metric="low">0</strong><span>con 1 o 2 pares</span></article>
+      <article class="inventory-metric danger"><small>TALLAS AGOTADAS</small><strong data-inventory-metric="out">0</strong><span>sin existencias</span></article>
+      ${W.admin() ? '<article class="inventory-metric private"><small>CAPITAL EN BODEGA</small><strong data-inventory-metric="capital">$0</strong><span>estimado a costo</span></article>' : ''}
+    </div>
+    <div class="inventory-controls">
+      <div class="inventory-filter-list" role="group" aria-label="Filtrar modelos por existencias">${filters.map(([key, label]) => `<button type="button" class="inventory-filter-button" data-inventory-filter="${key}" aria-pressed="false"><span>${label}</span><b class="inventory-filter-count">0</b></button>`).join('')}</div>
+      <div class="inventory-tools">
+        <label class="inventory-tool-field"><span>Categoría</span><select aria-label="Filtrar por categoría" data-inventory-category><option value="all">Todas</option>${categories.map(category => `<option value="${esc(category)}">${esc(category)}</option>`).join('')}</select></label>
+        <label class="inventory-tool-field"><span>Ordenar</span><select aria-label="Ordenar modelos" data-inventory-sort><option value="model">Modelo A–Z</option><option value="stock-desc">Mayor existencia</option><option value="stock-asc">Menor existencia</option></select></label>
+        <button type="button" class="secondary inventory-export" data-export-inventory>⇩ Descargar Excel</button>
+      </div>
+      <p class="inventory-results-summary" aria-live="polite"></p>
+    </div>`;
+    toolbar.insertAdjacentElement('afterend', controls);
+    const sortSelect = controls.querySelector('[data-inventory-sort]');
+    const categorySelect = controls.querySelector('[data-inventory-category]');
+    const exportButton = controls.querySelector('[data-export-inventory]');
+    sortSelect.value = selectedSort;
+    categorySelect.value = selectedCategory;
+    const stock = group => group.sizes.reduce((sum, size) => sum + Number(size.stock || 0), 0);
+    const low = group => stock(group) > 0 && group.sizes.some(size => Number(size.stock || 0) <= 2);
+    const matchesFilter = group => selectedFilter === 'available' ? stock(group) > 0 : selectedFilter === 'low' ? low(group) : selectedFilter === 'out' ? stock(group) <= 0 : true;
+    const matchingGroups = () => {
+      const query = String(input.value || '').toLowerCase();
+      return W.groups().filter(group => (selectedCategory === 'all' || String(group.category || '').trim() === selectedCategory) && `${group.name} ${group.brand} ${group.color} ${group.category} ${group.sizes.map(size => `${size.sku} ${size.size}`).join(' ')}`.toLowerCase().includes(query));
+    };
+    let visibleGroups = [];
+    const refresh = () => {
+      const groups = matchingGroups(), byId = new Map(groups.map(group => [String(group.pid), group]));
+      const allCards = [...results.querySelectorAll('.product-card')];
+      const cards = allCards.map(card => ({ card, group: byId.get(String(card.dataset.id)) })).filter(entry => entry.group);
+      const nameOrder = (a, b) => String(a.group.name || '').localeCompare(String(b.group.name || ''), 'es', { numeric: true, sensitivity: 'base' });
+      cards.sort((a, b) => selectedSort === 'stock-desc' ? stock(b.group) - stock(a.group) || nameOrder(a, b) : selectedSort === 'stock-asc' ? stock(a.group) - stock(b.group) || nameOrder(a, b) : nameOrder(a, b));
+      const grid = results.querySelector('.product-grid');
+      if (grid) cards.forEach(({ card }) => grid.append(card));
+      const visible = cards.filter(({ group }) => matchesFilter(group));
+      visibleGroups = visible.map(({ group }) => group);
+      allCards.forEach(card => { const group = byId.get(String(card.dataset.id)); card.classList.toggle('inventory-filtered-out', !group || !matchesFilter(group)); });
+      const counts = { all: groups.length, available: groups.filter(group => stock(group) > 0).length, low: groups.filter(low).length, out: groups.filter(group => stock(group) <= 0).length };
+      for (const button of controls.querySelectorAll('[data-inventory-filter]')) {
+        const key = button.dataset.inventoryFilter, label = filters.find(item => item[0] === key)?.[1] || 'Modelos';
+        button.setAttribute('aria-pressed', String(selectedFilter === key));
+        button.setAttribute('aria-label', `${label}: ${counts[key]} modelos`);
+        button.querySelector('.inventory-filter-count').textContent = counts[key].toLocaleString('es-CO');
+      }
+      controls.querySelector('.inventory-results-summary').textContent = `${visible.length.toLocaleString('es-CO')} de ${groups.length.toLocaleString('es-CO')} modelos`;
+      const units = groups.reduce((sum, group) => sum + stock(group), 0);
+      const lowSizes = groups.reduce((sum, group) => sum + group.sizes.filter(size => Number(size.stock || 0) > 0 && Number(size.stock || 0) <= 2).length, 0);
+      const outSizes = groups.reduce((sum, group) => sum + group.sizes.filter(size => Number(size.stock || 0) <= 0).length, 0);
+      controls.querySelector('[data-inventory-metric="models"]').textContent = groups.length.toLocaleString('es-CO');
+      controls.querySelector('[data-inventory-metric="pairs"]').textContent = units.toLocaleString('es-CO');
+      controls.querySelector('[data-inventory-metric="low"]').textContent = lowSizes.toLocaleString('es-CO');
+      controls.querySelector('[data-inventory-metric="out"]').textContent = outSizes.toLocaleString('es-CO');
+      const capital = controls.querySelector('[data-inventory-metric="capital"]');
+      if (capital) capital.textContent = W.money(groups.reduce((sum, group) => sum + group.sizes.reduce((sizeSum, size) => sizeSum + Number(size.stock || 0) * Number(group.cost || 0), 0), 0));
+      exportButton.disabled = !visible.length;
+      let empty = results.querySelector('.inventory-filter-empty');
+      if (allCards.length && !visible.length) {
+        if (!empty) {
+          empty = document.createElement('div');
+          empty.className = 'inventory-filter-empty';
+          empty.innerHTML = `<span>No hay modelos ${selectedFilter === 'out' ? 'agotados' : selectedFilter === 'low' ? 'por reponer' : 'con existencias'} con estos criterios.</span><button type="button" class="secondary" data-clear-inventory-filter>Quitar filtros</button>`;
+          results.append(empty);
+          empty.querySelector('[data-clear-inventory-filter]').addEventListener('click', () => { selectedFilter = 'all'; selectedCategory = 'all'; W.ui.inventoryWebFilter = selectedFilter; W.ui.inventoryWebCategory = selectedCategory; categorySelect.value = selectedCategory; refresh(); });
+        } else empty.querySelector('span').textContent = `No hay modelos ${selectedFilter === 'out' ? 'agotados' : selectedFilter === 'low' ? 'por reponer' : 'con existencias'} con estos criterios.`;
+      } else empty?.remove();
+    };
+    for (const button of controls.querySelectorAll('[data-inventory-filter]')) button.addEventListener('click', () => { selectedFilter = button.dataset.inventoryFilter; W.ui.inventoryWebFilter = selectedFilter; refresh(); });
+    sortSelect.addEventListener('change', () => { selectedSort = sortSelect.value; W.ui.inventoryWebSort = selectedSort; refresh(); });
+    categorySelect.addEventListener('change', () => { selectedCategory = categorySelect.value; W.ui.inventoryWebCategory = selectedCategory; refresh(); });
+    exportButton.addEventListener('click', async () => {
+      if (!visibleGroups.length) return;
+      exportButton.disabled = true;
+      try {
+        const admin = W.admin();
+        const columns = [['Modelo', 'model', 28], ['Marca', 'brand', 18], ['Color', 'color', 16], ['Categoría', 'category', 18], ['Talla', 'size', 10], ['Código', 'sku', 22], ['Stock actual', 'stock', 14], ['Estado', 'status', 16], ['Precio de venta', 'price', 18, 'money'], ...(admin ? [['Costo unitario', 'cost', 18, 'money'], ['Valor en bodega', 'value', 20, 'money']] : []), ['Pares por pedir', 'reorder', 16]];
+        const rows = visibleGroups.flatMap(group => group.sizes.map(size => {
+          const quantity = Number(size.stock || 0);
+          return { model: group.name, brand: group.brand || '', color: group.color || '', category: group.category || '', size: size.size, sku: size.sku, stock: quantity, status: quantity <= 0 ? 'Agotado' : quantity <= 2 ? 'Por reponer' : 'Disponible', price: Number(group.price || 0), ...(admin ? { cost: Number(group.cost || 0), value: quantity * Number(group.cost || 0) } : {}), reorder: '' };
+        }));
+        const date = W.today();
+        const result = await window.api.exportRows(W.token, { name: `WannaShop-inventario-${date}.xlsx`, sheet: 'Inventario', columns, rows });
+        if (result?.ok) W.toast('Inventario descargado', `${rows.length} talla(s) · ${result.path || 'Excel listo'}`);
+      } catch (error) { W.toast('No se pudo exportar', W.cleanError(error), 'error'); }
+      finally { exportButton.disabled = !visibleGroups.length; }
+    });
+    const baseSearch = input.oninput;
+    input.oninput = event => { baseSearch?.call(input, event); refresh(); };
+    refresh();
   };
 
   W.actions.logout = async () => { try { await window.api.logout(W.token); } catch {} W.token = ''; W.data = null; W.closeModal(); lastStatus.demo = false; showWelcome(); };

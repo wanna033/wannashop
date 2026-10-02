@@ -119,6 +119,6 @@
   setInterval(()=>{if(WS.data)WS.syncChrome()},60000);
   WS.authLayout=authLayout;WS.enterShell=enterShell;
   // La versión web carga su puente (window.api) como módulo: se arranca cuando todo el documento está listo.
-  const start=async()=>{try{const status=await window.api.authStatus();if(status.web)return WS.webAuth(status);status.needsSetup?showSetup():showLogin()}catch(error){WS.$('#authRoot').innerHTML=authLayout('No se pudo iniciar',WS.cleanError(error),'','Reintentar');WS.hideBoot()}};
+  const start=async()=>{let timeout;try{const authStatus=window.api.authStatus(),status=await(window.api?.web?Promise.race([authStatus,new Promise((_,reject)=>{timeout=setTimeout(()=>reject(new Error('La verificación de inicio está tardando demasiado. Comprueba tu conexión y vuelve a intentarlo.')),12000)})]):authStatus);if(status.web)return WS.webAuth(status);status.needsSetup?showSetup():showLogin()}catch(error){const message=WS.cleanError(error);if(window.api?.web&&WS.webAuth){WS.webAuth({web:true,cloudAvailable:true,error:message,retryable:true});return}WS.$('#authRoot').innerHTML=authLayout('No se pudo iniciar',message,'','Reintentar');const form=WS.$('#authForm');if(form)form.onsubmit=event=>{event.preventDefault();start()};WS.hideBoot()}finally{clearTimeout(timeout)}};
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',start):start();
 })();
