@@ -54,6 +54,16 @@
     if (event.key === 'wannashop.business' && inSession() && event.newValue && event.newValue !== W.data?.web?.business?.id) location.reload();
   });
 
+  // Sin internet: aviso fijo arriba para que nadie crea que guardó algo; al volver la señal se actualizan los datos.
+  const offline = document.createElement('div');
+  offline.className = 'offline-bar hidden'; offline.setAttribute('role', 'status');
+  offline.innerHTML = '<b>Sin conexión a internet.</b> <span>Puedes consultar; los cambios no se guardan hasta que vuelva la señal.</span>';
+  document.body.append(offline);
+  const syncOnline = () => { const down = navigator.onLine === false; offline.classList.toggle('hidden', !down); document.documentElement.classList.toggle('is-offline', down); };
+  window.addEventListener('offline', syncOnline);
+  window.addEventListener('online', () => { syncOnline(); if (inSession()) { W.toast('Conexión recuperada', 'Ya puedes seguir registrando.'); W.reload?.(); } });
+  syncOnline();
+
   // Configuración → Seguridad (solo el administrador).
   const baseSettings = W.routes.settings;
   W.routes.settings = () => {

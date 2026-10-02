@@ -119,7 +119,7 @@
     controls.innerHTML = `<div class="inventory-summary" aria-label="Resumen de existencias">
       <article class="inventory-metric"><small>MODELOS</small><strong data-inventory-metric="models">0</strong><span>en esta selección</span></article>
       <article class="inventory-metric"><small>PARES EN BODEGA</small><strong data-inventory-metric="pairs">0</strong><span>disponibles ahora</span></article>
-      <article class="inventory-metric warn"><small>TALLAS POR REPONER</small><strong data-inventory-metric="low">0</strong><span>con 1 o 2 pares</span></article>
+      <article class="inventory-metric warn"><small>TALLAS POR REPONER</small><strong data-inventory-metric="low">0</strong><span>con ${W.lowLimit()} par(es) o menos</span></article>
       <article class="inventory-metric danger"><small>TALLAS AGOTADAS</small><strong data-inventory-metric="out">0</strong><span>sin existencias</span></article>
       ${W.admin() ? '<article class="inventory-metric private"><small>CAPITAL EN BODEGA</small><strong data-inventory-metric="capital">$0</strong><span>estimado a costo</span></article>' : ''}
     </div>
@@ -139,7 +139,7 @@
     sortSelect.value = selectedSort;
     categorySelect.value = selectedCategory;
     const stock = group => group.sizes.reduce((sum, size) => sum + Number(size.stock || 0), 0);
-    const low = group => stock(group) > 0 && group.sizes.some(size => Number(size.stock || 0) <= 2);
+    const low = group => stock(group) > 0 && group.sizes.some(size => Number(size.stock || 0) <= W.lowLimit());
     const matchesFilter = group => selectedFilter === 'available' ? stock(group) > 0 : selectedFilter === 'low' ? low(group) : selectedFilter === 'out' ? stock(group) <= 0 : true;
     const matchingGroups = () => {
       const query = String(input.value || '').toLowerCase();
@@ -166,7 +166,7 @@
       }
       controls.querySelector('.inventory-results-summary').textContent = `${visible.length.toLocaleString('es-CO')} de ${groups.length.toLocaleString('es-CO')} modelos`;
       const units = groups.reduce((sum, group) => sum + stock(group), 0);
-      const lowSizes = groups.reduce((sum, group) => sum + group.sizes.filter(size => Number(size.stock || 0) > 0 && Number(size.stock || 0) <= 2).length, 0);
+      const lowSizes = groups.reduce((sum, group) => sum + group.sizes.filter(size => Number(size.stock || 0) > 0 && Number(size.stock || 0) <= W.lowLimit()).length, 0);
       const outSizes = groups.reduce((sum, group) => sum + group.sizes.filter(size => Number(size.stock || 0) <= 0).length, 0);
       controls.querySelector('[data-inventory-metric="models"]').textContent = groups.length.toLocaleString('es-CO');
       controls.querySelector('[data-inventory-metric="pairs"]').textContent = units.toLocaleString('es-CO');
@@ -197,7 +197,7 @@
         const columns = [['Modelo', 'model', 28], ['Marca', 'brand', 18], ['Color', 'color', 16], ['Categoría', 'category', 18], ['Talla', 'size', 10], ['Código', 'sku', 22], ['Stock actual', 'stock', 14], ['Estado', 'status', 16], ['Precio de venta', 'price', 18, 'money'], ...(admin ? [['Costo unitario', 'cost', 18, 'money'], ['Valor en bodega', 'value', 20, 'money']] : []), ['Pares por pedir', 'reorder', 16]];
         const rows = visibleGroups.flatMap(group => group.sizes.map(size => {
           const quantity = Number(size.stock || 0);
-          return { model: group.name, brand: group.brand || '', color: group.color || '', category: group.category || '', size: size.size, sku: size.sku, stock: quantity, status: quantity <= 0 ? 'Agotado' : quantity <= 2 ? 'Por reponer' : 'Disponible', price: Number(group.price || 0), ...(admin ? { cost: Number(group.cost || 0), value: quantity * Number(group.cost || 0) } : {}), reorder: '' };
+          return { model: group.name, brand: group.brand || '', color: group.color || '', category: group.category || '', size: size.size, sku: size.sku, stock: quantity, status: quantity <= 0 ? 'Agotado' : quantity <= W.lowLimit() ? 'Por reponer' : 'Disponible', price: Number(group.price || 0), ...(admin ? { cost: Number(group.cost || 0), value: quantity * Number(group.cost || 0) } : {}), reorder: quantity <= W.lowLimit() ? Math.max(0, W.targetStock() - quantity) : 0 };
         }));
         const date = W.today();
         const result = await window.api.exportRows(W.token, { name: `WannaShop-inventario-${date}.xlsx`, sheet: 'Inventario', columns, rows });

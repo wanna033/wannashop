@@ -242,3 +242,24 @@
   .quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 }
 @keyframes wsSpin { to { transform: rotate(360deg); } }
+
+/* ---------- Celular: inventario y negocios más compactos ---------- */
+@media (max-width: 760px), (pointer: coarse) and (max-height: 540px) {
+  /* Filtros de inventario en dos filas cortas: estados y luego categoría, orden y Excel */
+  .inventory-tools { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto !important; gap: 8px; align-items: end; }
+  .inventory-tools .inventory-export { grid-column: auto !important; font-size: 0; min-width: 72px; padding-inline: 10px; }
+  .inventory-tools .inventory-export::before { content: '⇩ Excel'; font-size: 13px; }
+  .inventory-tool-field > span { display: none; }
+  .inventory-results-summary { margin: 4px 0 0; font-size: 12px; }
+  /* Botón de la cámara junto al buscador */
+  .scan-button { border: 1px solid var(--line-strong); background: var(--surface); color: var(--text); }
+  /* Negocios: cada uno en una fila (foto pequeña, nombre y pares en consignación) */
+  .business-grid { gap: 8px; }
+  .business-grid .business-card { position: relative; display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: 12px; padding: 8px 12px 8px 8px; }
+  .business-grid .business-card .media-frame { position: static; width: 64px; height: 64px !important; border-radius: 12px; font-size: 20px; }
+  .business-grid .business-card .media-overlay { position: absolute; inset: auto 12px auto auto; top: 50%; transform: translateY(-50%); padding: 0; background: none; }
+  .business-grid .business-card .card-content { padding: 0 110px 0 0; min-width: 0; }
+  .business-grid .business-card .card-content h3 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .business-detail .media-frame { height: 96px !important; min-height: 0 !important; aspect-ratio: auto !important; }
+  .restock-qty { width: 72px; }
+}

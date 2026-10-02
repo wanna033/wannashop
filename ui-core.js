@@ -63,6 +63,9 @@
     WS.modal(`<h2 id="modalTitle">${WS.esc(title)}</h2><p class="modal-subtitle">${WS.esc(message)}</p><label class="field">${WS.esc(label)}<input id="promptValue" type="${WS.esc(type)}" value="${WS.esc(value)}" placeholder="${WS.esc(placeholder)}"></label><div class="form-actions"><button class="secondary" id="promptCancel">Cancelar</button><button class="primary" id="promptOk">Continuar</button></div>`,{onOpen:()=>{WS.$('#promptCancel').onclick=()=>{WS.closeModal();resolve(null)};WS.$('#promptOk').onclick=()=>{const value=WS.$('#promptValue').value.trim();if(!value)return WS.toast('Completa el campo','','warning');WS.closeModal();resolve(value)}}});
   });
 
+  // Talla «por reponer»: con este número de pares o menos (Configuración → Reposición; 2 por defecto).
+  WS.lowLimit = () => { const value = Number(WS.data?.settings?.minStock); return Number.isInteger(value) && value >= 0 ? value : 2; };
+  WS.targetStock = () => { const value = Number(WS.data?.settings?.targetStock); return Number.isInteger(value) && value > 0 ? Math.max(value, WS.lowLimit()) : Math.max(6, WS.lowLimit()); };
   WS.command = async (type,payload={},options={}) => {
     if(WS.commandBusy){WS.toast('Operación en curso','Espera un momento para evitar duplicados.','warning');return null}
     WS.commandBusy=true;const operationId=WS.id('OP'),command={type,payload,operationId,expectedRevision:WS.data.meta.revision};
