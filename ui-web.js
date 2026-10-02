@@ -2,6 +2,7 @@
 (() => {
   const W = window.WS, $ = W.$, esc = W.esc;
   const googleMark = '<svg class="google-mark" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.7c4.3-4 6.9-9.9 6.9-17z"/><path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.8-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.4 2.3-6.2 0-11.5-4.1-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>';
+  const appleMark = '<svg class="apple-mark" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.1zM13.9 4.9c.7-.9 1.2-2 1.1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.1.1 2.3-.6 3-1.5z"/></svg>';
   const appUrl = () => location.origin + location.pathname.replace(/index\.html$/, '');
   let lastStatus = {};
 
@@ -25,16 +26,20 @@
       <div id="authError" class="error-box ${message ? '' : 'hidden'}">${esc(message)}</div>
       ${retryable ? '<button type="button" class="secondary button" id="retryStartup">Volver a cargar WannaShop</button>' : ''}
       ${cloud ? `<button type="button" class="primary button google-button" id="googleSignIn">${googleMark}<span>Entrar con Google</span></button>` : ''}
+      ${cloud && window.api?.signInOptions?.apple ? `<button type="button" class="button apple-button" id="appleSignIn">${appleMark}<span>Entrar con Apple</span></button>` : ''}
       ${cloud ? '' : '<button type="button" class="secondary button demo-button" id="startDemo">Probar sin cuenta (demostración)</button>'}
       <p class="auth-legal"><a href="ayuda.html" target="_blank" rel="noopener">¿Cómo funciona? Lee la guía paso a paso</a></p>
       ${legal}`));
-    $('#googleSignIn')?.addEventListener('click', signIn);
+    $('#googleSignIn')?.addEventListener('click', () => signIn('google'));
+    $('#appleSignIn')?.addEventListener('click', () => signIn('apple'));
     $('#startDemo')?.addEventListener('click', startDemo);
     $('#retryStartup')?.addEventListener('click', () => location.reload());
   }
-  async function signIn() {
-    const button = $('#googleSignIn'); busy(button, true);
-    try { route(await window.api.googleLogin()); }
+  W.showWelcome = message => { lastStatus.demo = false; showWelcome(message); };
+  async function signIn(method = 'google') {
+    const button = $(method === 'apple' ? '#appleSignIn' : '#googleSignIn'); busy(button, true);
+    W.markActive?.(); W.freshSignIn = true; // entrada nueva: no aplica el cierre por inactividad
+    try { route(await (method === 'apple' ? window.api.appleLogin() : window.api.googleLogin())); }
     catch (error) { showWelcome(/popup-closed|cancelled-popup/i.test(String(error?.code || error?.message)) ? '' : W.cleanError(error)); }
   }
   async function startDemo() {
@@ -246,7 +251,7 @@
 
   // Guía rápida y primeros pasos para quien empieza.
   W.actions.quickGuide = () => W.modal(`<h2 id="modalTitle">Guía rápida</h2><p class="modal-subtitle">Lo esencial en 5 pasos.</p><ol class="guide-list">
-    <li><b>Crea tus modelos</b> en Inventario → <i>Nuevo modelo</i>: un zapato con todas sus tallas y cuántos pares hay de cada una. Con <i>Registrar con foto</i> la IA lo llena por ti.</li>
+    <li><b>Crea tus modelos</b> en Inventario → <i>Nuevo modelo</i>: un zapato con todas sus tallas y cuántos pares hay de cada una.</li>
     <li><b>Vende</b> en <i>Vender</i>: toca la talla (o escanea su código con 📷) y luego <i>Continuar y facturar</i>.</li>
     <li><b>Despacha a tus locales</b> en Negocios asociados → <i>Despachar</i>: toca cada talla que envías.</li>
     <li><b>Cierra el día</b> de cada local: escribe lo vendido; lo demás vuelve a bodega o se queda allá.</li>
@@ -280,7 +285,7 @@
   };
 
   // Configuración: la protección de datos es la nube, no carpetas del equipo.
-  const cloudPanel = () => { const demo = W.data.web?.demo; return `<div class="panel-head"><div><h2>Datos en la nube</h2><p>${demo ? 'Modo demostración' : 'Cada cambio se guarda en línea al instante'}</p></div></div><div class="panel-body protection-summary"><div class="protection-row"><span class="status-orb ${demo ? 'warn' : ''}"></span><span><b>${demo ? 'Solo en este navegador' : 'Guardado en Google Cloud'}</b><small>${demo ? 'Crea tu negocio real para usarla en varios equipos' : 'Entra desde cualquier equipo o celular'}</small></span></div><div class="protection-row"><span class="status-orb ${demo ? 'warn' : ''}"></span><span><b>Fotos en la nube</b><small>${demo ? 'Guardadas en este navegador' : 'Se ven en todos los equipos'}</small></span></div><div class="protection-row"><span class="status-orb ${demo ? 'warn' : ''}"></span><span><b>Copias diarias</b><small>${demo ? 'Solo en la nube' : 'Se guardan solas, 30 días'}</small></span></div><div class="settings-actions">${demo ? '' : '<button class="secondary" data-action="cloudBackups">Ver copias diarias</button>'}<button class="secondary" data-action="backupNow">Descargar una copia</button></div></div>`; };
+  const cloudPanel = () => { const demo = W.data.web?.demo; return `<div class="panel-head"><div><h2>Datos en la nube</h2><p>${demo ? 'Modo demostración' : 'Cada cambio se guarda en línea al instante'}</p></div></div><div class="panel-body protection-summary"><div class="protection-row"><span class="status-orb ${demo ? 'warn' : ''}"></span><span><b>${demo ? 'Solo en este navegador' : 'Guardado en Google Cloud'}</b><small>${demo ? 'Crea tu negocio real para usarla en varios equipos' : 'Entra desde cualquier equipo o celular'}</small></span></div><div class="protection-row"><span class="status-orb ${demo ? 'warn' : ''}"></span><span><b>Fotos en la nube</b><small>${demo ? 'Guardadas en este navegador' : 'Se ven en todos los equipos'}</small></span></div><div class="protection-row"><span class="status-orb ${demo ? 'warn' : ''}"></span><span><b>Copias automáticas</b><small>${demo ? 'Solo en la nube' : 'Cada hora (24 puntos) y cada día (30 días)'}</small></span></div><div class="settings-actions">${demo ? '' : '<button class="secondary" data-action="cloudBackups">Ver copias automáticas</button>'}<button class="secondary" data-action="backupNow">Descargar una copia</button></div></div>`; };
   const baseSettings = W.routes.settings;
   W.routes.settings = () => {
     baseSettings();
@@ -290,22 +295,22 @@
     $('[data-action="renewRecovery"]')?.remove();
     const restore = $('[data-action="restoreBackup"]'); if (restore) restore.textContent = 'Importar respaldo (también de la app de escritorio)';
     const backup = $('.settings-layout aside [data-action="backupNow"]:not(.protection-summary *)'); if (backup) backup.textContent = 'Descargar respaldo';
-    $('input[name="aiKey"]')?.closest('.form-grid')?.insertAdjacentHTML('afterend', '<p class="field-hint">En la web, la clave se guarda solo en este navegador: en cada equipo se escribe una vez.</p>');
   };
-  // Copias diarias automáticas en la nube (las últimas 30).
+  // Copias automáticas en la nube: un punto por hora (últimas 24) y uno por día (últimos 30).
+  const backupLabel = item => item.hourly ? (() => { const date = new Date(`${item.day.slice(1)}:00`), today = new Date().toDateString() === date.toDateString(); return `${today ? 'Hoy' : date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}, ${date.toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' })}`; })() : `${new Date(`${item.day}T12:00`).toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })} (inicio del día)`;
   W.actions.cloudBackups = async () => {
     try {
       const list = await window.api.cloudBackups(W.token);
-      W.modal(`<h2 id="modalTitle">Copias diarias en la nube</h2><p class="modal-subtitle">Cada día, el primer guardado deja una copia completa del día anterior. Se conservan las últimas 30. Restaurar reemplaza los datos actuales por los de esa copia (queda registrado).</p>${list.length ? `<div class="table-wrap"><table class="data-table"><thead><tr><th>Copia del</th><th>Modelos</th><th>Revisión</th><th></th></tr></thead><tbody>${list.map(item => `<tr><td><b>${esc(item.day)}</b></td><td>${item.products}</td><td>#${item.revision}</td><td><button class="secondary" data-action="restoreCloudBackup" data-day="${esc(item.day)}">Restaurar</button></td></tr>`).join('')}</tbody></table></div>` : W.empty('☁', 'Todavía no hay copias', 'La primera se crea mañana, con el primer movimiento del día.')}<div class="form-actions"><button class="secondary" data-action="closeModal">Cerrar</button><button class="primary" data-action="backupNow">Descargar copia ahora</button></div>`, { wide: true });
+      W.modal(`<h2 id="modalTitle">Copias automáticas en la nube</h2><p class="modal-subtitle">Se crean solas mientras trabajas: un punto de restauración cada hora (las últimas 24) y una copia por día (los últimos 30 días). Restaurar reemplaza los datos actuales por los de esa copia y queda registrado.</p>${list.length ? `<div class="table-wrap"><table class="data-table"><thead><tr><th>Cómo estaban los datos</th><th>Tipo</th><th>Modelos</th><th></th></tr></thead><tbody>${list.map(item => `<tr><td><b>${esc(backupLabel(item))}</b></td><td>${item.hourly ? '<span class="badge neutral">Por hora</span>' : '<span class="badge success">Diaria</span>'}</td><td>${item.products}</td><td><button class="secondary" data-action="restoreCloudBackup" data-day="${esc(item.day)}" data-label="${esc(backupLabel(item))}">Restaurar</button></td></tr>`).join('')}</tbody></table></div>` : W.empty('☁', 'Todavía no hay copias', 'El primer punto se crea en la próxima hora en que registres un movimiento.')}<div class="form-actions"><button class="secondary" data-action="closeModal">Cerrar</button><button class="primary" data-action="backupNow">Descargar copia ahora</button></div>`, { wide: true });
     } catch (error) { W.toast('No se pudieron ver las copias', W.cleanError(error), 'error'); }
   };
   W.actions.restoreCloudBackup = async (_, data) => {
-    const ok = await W.confirm({ title: `Restaurar la copia del ${data.day}`, message: 'Los datos actuales se reemplazarán por los de esa copia en todos los equipos. Antes, descarga una copia de hoy por si acaso.', confirmText: 'Restaurar', danger: true });
+    const ok = await W.confirm({ title: `Restaurar: ${data.label || data.day}`, message: 'Los datos actuales se reemplazarán por los de esa copia en todos los equipos. Antes, descarga una copia de hoy por si acaso.', confirmText: 'Restaurar', danger: true });
     if (!ok) return;
-    try { const result = await window.api.restoreCloudBackup(W.token, data.day); W.data = result.data; W.closeModal(); W.render('dashboard'); W.toast('Copia restaurada', `Los datos quedaron como el ${data.day}.`); }
+    try { const result = await window.api.restoreCloudBackup(W.token, data.day); W.data = result.data; W.closeModal(); W.render('dashboard'); W.toast('Copia restaurada', `Los datos quedaron como estaban: ${data.label || data.day}.`); }
     catch (error) { W.toast('No se pudo restaurar', W.cleanError(error), 'error'); }
   };
-  W.actions.openProtection = () => W.modal(`<h2 id="modalTitle">Datos en la nube</h2><p class="modal-subtitle">${W.data.web?.demo ? 'En el modo demostración todo queda en este navegador.' : 'Cada cambio se guarda en Google Cloud y se ve al instante en los demás equipos. Puedes descargar una copia completa cuando quieras.'}</p><div class="form-actions"><button class="secondary" data-action="closeModal">Cerrar</button>${!W.data.web?.demo && W.admin() ? '<button class="secondary" data-action="cloudBackups">Copias diarias</button>' : ''}<button class="primary" data-action="backupNow">Descargar copia</button></div>`);
+  W.actions.openProtection = () => W.modal(`<h2 id="modalTitle">Datos en la nube</h2><p class="modal-subtitle">${W.data.web?.demo ? 'En el modo demostración todo queda en este navegador.' : 'Cada cambio se guarda en Google Cloud y se ve al instante en los demás equipos. Puedes descargar una copia completa cuando quieras.'}</p><div class="form-actions"><button class="secondary" data-action="closeModal">Cerrar</button>${!W.data.web?.demo && W.admin() ? '<button class="secondary" data-action="cloudBackups">Copias automáticas</button>' : ''}<button class="primary" data-action="backupNow">Descargar copia</button></div>`);
   W.actions.chooseBackupFolder = W.actions.openProtection;
 
   // Avisos fijos arriba: sin internet y versión nueva disponible.

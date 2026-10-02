@@ -38,7 +38,6 @@
       { admin: true, target: () => document.querySelector('#productPhoto')?.closest('label, .field, .photo-field') || document.querySelector('#productPhotoPreview'), title: 'Foto', text: 'Agrega una foto del zapato: se ve en el inventario, al vender, al despachar y en tu catálogo.' },
       { admin: true, target: '#modal .form-actions .primary', title: 'Guardar', text: 'Al guardar, el modelo queda listo para vender y despachar.' },
       { admin: true, before: () => W.closeModal(), target: '#app [data-action="importProducts"]', title: '¿Tienes muchos modelos?', text: 'Importa todo tu inventario desde Excel: descargas la plantilla, la llenas y la subes. Antes de guardar te muestra un resumen.' },
-      { admin: true, target: '#app [data-action="aiProduct"]', title: 'Registrar con foto (IA)', text: 'Tomas una foto, escribes por ejemplo «20 pares talla 34 y 6 talla 37» y la inteligencia artificial llena el modelo. Requiere una clave de IA en Configuración.' },
       { target: '#app [data-action="printLabels"]', title: 'Etiquetas', text: 'Imprime etiquetas con el código de barras, la talla y el precio de cada par.' },
       { target: '#app [data-action="stockCount"]', title: 'Conteo físico', text: 'Para revisar la bodega: escaneas o cuentas los pares y WannaShop corrige solo las diferencias, dejando registro.' }
     ] },
@@ -64,7 +63,7 @@
       { admin: true, view: 'salesReport', target: '#app .report-toolbar', title: 'Reportes de ventas', text: 'Ventas por período comparadas con el anterior, modelos y tallas más vendidos, por vendedor y por forma de pago. Descárgalo en Excel.' }
     ] },
     { id: 'team', icon: '👥', title: 'Equipo, catálogo y ajustes', summary: 'Invitar personas, publicar tu catálogo y configurar tu negocio.', minutes: 2, admin: true, steps: [
-      { view: 'settings', target: '#settingsForm', title: 'Configuración', text: 'Los datos de tu negocio (salen en las facturas), el IVA si lo cobras, el horario de trabajo y el asistente de IA.' },
+      { view: 'settings', target: '#settingsForm', title: 'Configuración', text: 'Los datos de tu negocio (salen en las facturas), el IVA si lo cobras, el horario de trabajo y la suscripción.' },
       { target: '.settings-layout aside .panel', title: 'Tus datos protegidos', text: 'Todo se guarda en la nube al instante y cada día queda una copia automática. También puedes descargar una copia completa.' },
       { before: () => W.actions.staff(), target: '#modal [data-action="staffNew"]', title: 'Invita a tu equipo', text: 'Escribe el Gmail de la persona y elige su rol: operador (vende, despacha y cobra, sin ver costos) o administrador. Luego le envías el enlace por WhatsApp.' },
       { before: () => W.closeModal(), view: 'inventory', target: '#app [data-action="catalog"]', title: 'Tu catálogo en línea', text: 'Publica una página con tus modelos, fotos, precios y tallas disponibles. Tus clientes la abren desde un enlace y te piden por WhatsApp.' },

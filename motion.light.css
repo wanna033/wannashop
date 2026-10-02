@@ -5,7 +5,7 @@
   --ease-out: cubic-bezier(.16, 1, .3, 1);      /* entra rápido y se asienta */
   --ease-in-out: cubic-bezier(.65, 0, .35, 1);
   --t-fast: 140ms; --t-base: 220ms; --t-slow: 360ms;
-  --lift: 0 1px 2px rgba(15, 23, 42, .05), 0 8px 24px rgba(15, 23, 42, .09);
+  --lift: 0 1px 2px rgba(207,217,240,0.05), 0 8px 24px rgba(207,217,240,0.09);
 }
 
 /* ---------- Fondo: quieto, con una luz suave del color de la marca ---------- */
@@ -41,7 +41,7 @@ button.loading { cursor: progress; }
 #mainNav { position: relative; }
 #mainNav button { position: relative; z-index: 1; transition: background-color var(--t-fast), color var(--t-fast); }
 .nav-glider { position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none; border-radius: 10px; opacity: 0;
-  background: var(--nav-active-bg, rgba(31, 124, 255, .16)); box-shadow: inset 3px 0 0 var(--nav-active-bar, #3aa0ff);
+  background: var(--nav-active-bg, rgba(0,101,244,0.16)); box-shadow: inset 3px 0 0 var(--nav-active-bar, rgba(0,114,220,0.4));
   transition: transform var(--t-slow) var(--ease-out), height var(--t-slow) var(--ease-out), width var(--t-base), opacity var(--t-base); }
 .has-glider #mainNav button.active { background: transparent !important; box-shadow: none !important; }
 
@@ -68,7 +68,7 @@ button.loading { cursor: progress; }
 @keyframes wsGrowY { from { transform: scaleY(0); } }
 @keyframes wsGrowX { from { transform: scaleX(0); } }
 .status-orb { animation: wsPulse 2.8s ease-in-out infinite; }
-@keyframes wsPulse { 0%, 100% { box-shadow: 0 0 0 3px rgba(22, 163, 106, .14); } 50% { box-shadow: 0 0 0 6px rgba(22, 163, 106, 0); } }
+@keyframes wsPulse { 0%, 100% { box-shadow: 0 0 0 3px rgba(94,239,181,0.056); } 50% { box-shadow: 0 0 0 6px rgba(94,239,181,0); } }
 
 /* ---------- Guardado en la nube: barra fina arriba y aviso discreto ---------- */
 .save-bar { position: fixed; z-index: 200; left: 0; right: 0; top: 0; height: 3px; pointer-events: none; opacity: 0; transition: opacity .25s; overflow: hidden; }
@@ -76,16 +76,16 @@ button.loading { cursor: progress; }
 .save-bar::before { content: ''; position: absolute; top: 0; bottom: 0; width: 40%; border-radius: 3px; background: linear-gradient(90deg, transparent, var(--save-color, #2563eb), transparent); animation: wsSaving 1.1s var(--ease-in-out) infinite; }
 @keyframes wsSaving { from { left: -40%; } to { left: 100%; } }
 .save-pill { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 11px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap;
-  color: var(--save-ok, #15803d); background: var(--save-ok-bg, rgba(22, 163, 106, .1)); opacity: 0; transform: translateY(-4px); transition: opacity var(--t-base), transform var(--t-base) var(--ease-out); }
+  color: var(--save-ok, #7fefa9); background: var(--save-ok-bg, rgba(94,239,181,0.1)); opacity: 0; transform: translateY(-4px); transition: opacity var(--t-base), transform var(--t-base) var(--ease-out); }
 .save-pill.show { opacity: 1; transform: none; }
 .save-pill.saving { color: var(--muted); background: var(--surface-soft); }
-.save-pill.error { color: var(--danger); background: rgba(220, 38, 38, .1); }
+.save-pill.error { color: var(--danger); background: rgba(228,40,40,0.1); }
 .save-pill svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ---------- Confirmación al registrar una venta, un cierre o un despacho ---------- */
 .ws-check { position: fixed; z-index: 171; left: 50%; top: 40%; width: 72px; height: 72px; margin: -36px 0 0 -36px; border-radius: 50%; pointer-events: none;
-  display: grid; place-items: center; background: #16a34a; box-shadow: 0 10px 30px rgba(22, 163, 74, .35); animation: wsCheck .95s var(--ease-out) forwards; }
-.ws-check svg { width: 36px; height: 36px; stroke: #fff; stroke-width: 6; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 60; stroke-dashoffset: 60; animation: wsDraw .35s .12s ease forwards; }
+  display: grid; place-items: center; background: #16a34a; box-shadow: 0 10px 30px rgba(94,239,148,0.14); animation: wsCheck .95s var(--ease-out) forwards; }
+.ws-check svg { width: 36px; height: 36px; stroke: #171717; stroke-width: 6; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 60; stroke-dashoffset: 60; animation: wsDraw .35s .12s ease forwards; }
 @keyframes wsCheck { 0% { transform: scale(.6); opacity: 0; } 22% { transform: scale(1); opacity: 1; } 72% { transform: scale(1); opacity: 1; } 100% { transform: scale(.92); opacity: 0; } }
 @keyframes wsDraw { to { stroke-dashoffset: 0; } }
 
@@ -95,7 +95,7 @@ button.loading { cursor: progress; }
 
 /* ---------- Esqueletos mientras cargan los datos ---------- */
 .skeleton { position: relative; overflow: hidden; background: var(--surface-soft); border-radius: 10px; }
-.skeleton::after { content: ''; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .35), transparent); animation: wsSkeleton 1.3s ease-in-out infinite; }
+.skeleton::after { content: ''; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(23,23,23,0.35), transparent); animation: wsSkeleton 1.3s ease-in-out infinite; }
 @keyframes wsSkeleton { to { transform: translateX(100%); } }
 
 /* Quien prefiera menos movimiento no ve animaciones */
