@@ -78,7 +78,7 @@ button:not(:disabled):active, .button:active { transform: scale(.97); transition
 /* ---------- Ventanas, avisos y gráficos ---------- */
 .modal { animation: wsFadeBlur .25s ease both; }
 @keyframes wsFadeBlur { from { backdrop-filter: blur(0); background: rgba(0, 0, 0, 0); } }
-@media (min-width: 761px) { .modal-panel { animation: wsPopIn .42s var(--spring) both; } }
+@media (min-width: 761px) and (min-height: 541px), (min-width: 761px) and (pointer: fine) { .modal-panel { animation: wsPopIn .42s var(--spring) both; } }
 @keyframes wsPopIn { from { opacity: 0; transform: translateY(18px) scale(.95); } to { opacity: 1; transform: none; } }
 .toast { animation: wsToast .5s var(--spring) both; box-shadow: 0 18px 50px rgba(0, 0, 0, .45), 0 0 0 1px rgba(58, 160, 255, .18); }
 @keyframes wsToast { from { opacity: 0; transform: translateX(40px) scale(.96); } to { opacity: 1; transform: none; } }

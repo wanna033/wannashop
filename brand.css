@@ -75,7 +75,7 @@ html, body { background: var(--brand-950); }
 .boot-progress { margin: 0 auto 8px; background: rgba(58, 160, 255, .18); }
 .boot-progress span { background: linear-gradient(90deg, #0d5bff, #7cc4ff); }
 .boot-status { color: #dbe8ff; }
-@media (max-width: 760px) { .boot-screen { background-position: 22% center; } }
+@media (max-width: 760px), (pointer: coarse) and (max-height: 540px) { .boot-screen { background-position: 22% center; } }
 
 /* Inicio de sesión: banner a la izquierda (arriba en el celular) y la tarjeta para entrar */
 .auth-root.auth-split { padding: 0; display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(360px, 1fr); place-items: stretch; overflow: auto; }

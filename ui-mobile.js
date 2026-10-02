@@ -1,7 +1,7 @@
 // WannaShop en el celular: barra inferior, menú «Más», carrito flotante y escáner con la cámara.
 (() => {
   const W = window.WS, $ = W.$, esc = W.esc;
-  const phone = window.matchMedia('(max-width: 760px)');
+  const phone = window.matchMedia('(max-width: 760px), (pointer: coarse) and (max-height: 540px)');
   const TABS = [['dashboard', '⌂', 'Inicio'], ['inventory', '▦', 'Inventario'], ['sale', '◇', 'Vender'], ['businesses', '▤', 'Negocios']];
 
   $('#shell').insertAdjacentHTML('beforeend', `<nav id="tabBar" class="tab-bar" aria-label="Navegación principal">${TABS.map(([view, icon, label]) => `<button type="button" data-view="${view}" class="${view === 'sale' ? 'tab-main' : ''}"><i>${icon}</i><span>${label}</span></button>`).join('')}<button type="button" data-action="mobileMore" data-tab="more"><i>☰</i><span>Más</span></button></nav><button type="button" id="cartFab" class="cart-fab" data-action="mobileCart"></button>`);
@@ -139,6 +139,25 @@
     };
     tick();
   }
+
+  // Detección del dispositivo: clases en <html> para que la página se acomode (celular, tableta, táctil, app instalada).
+  function detectDevice() {
+    const root = document.documentElement, touch = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+    const small = Math.min(screen.width, screen.height) <= 540, ua = navigator.userAgent;
+    root.classList.toggle('is-touch', touch);
+    root.classList.toggle('is-phone', phone.matches || (touch && small) || /Android.+Mobile|iPhone|iPod/i.test(ua));
+    root.classList.toggle('is-tablet', touch && !small && /iPad|Android|Tablet/i.test(ua + (navigator.maxTouchPoints > 1 && /Macintosh/.test(ua) ? ' iPad' : '')));
+    root.classList.toggle('is-landscape', window.matchMedia('(orientation: landscape)').matches);
+    root.classList.toggle('is-app', window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true);
+  }
+  detectDevice();
+  window.addEventListener('resize', detectDevice);
+  window.addEventListener('orientationchange', () => setTimeout(() => { detectDevice(); W.syncChrome?.(); }, 250));
+  // Vibración corta al tocar los botones importantes (Android), como una app nativa.
+  document.addEventListener('pointerdown', event => {
+    if (event.pointerType !== 'touch' || !navigator.vibrate) return;
+    if (event.target.closest('.primary, .tab-bar button, .size-chip, .cart-fab, .danger')) navigator.vibrate(8);
+  }, { passive: true });
 
   phone.addEventListener?.('change', syncMobile);
 })();

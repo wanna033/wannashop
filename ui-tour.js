@@ -2,7 +2,7 @@
 // No guarda nada: solo muestra y explica. Cada capítulo se marca como visto en este navegador.
 (() => {
   const W = window.WS, $ = W.$, esc = W.esc;
-  const phone = () => window.matchMedia('(max-width: 760px)').matches;
+  const phone = () => window.matchMedia('(max-width: 760px), (pointer: coarse) and (max-height: 540px)').matches;
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
   const seen = {
     all() { try { return JSON.parse(localStorage.getItem('wannashop.tutorial') || '{}'); } catch { return {}; } },

@@ -1,7 +1,7 @@
 /* WannaShop en el celular: barra inferior, ventanas a pantalla completa y botones fáciles de tocar. */
 .tab-bar, .cart-fab, .scan-button { display: none; }
 
-@media (max-width: 760px) {
+@media (max-width: 760px), (pointer: coarse) and (max-height: 540px) {
   html, body { height: 100%; }
   body { -webkit-tap-highlight-color: transparent; }
   .shell { grid-template-columns: 1fr; height: 100dvh; }
@@ -124,7 +124,7 @@
 .more-foot { display: grid; gap: 8px; margin-top: 18px; }
 
 /* Tablas: en el celular cada fila es una tarjeta con los títulos de sus columnas */
-@media (max-width: 760px) {
+@media (max-width: 760px), (pointer: coarse) and (max-height: 540px) {
   .table-wrap { overflow: visible; }
   .data-table, .data-table tbody { display: block; width: 100%; }
   .data-table thead { display: none; }
@@ -139,14 +139,14 @@
   .data-table td[colspan] { grid-column: 1 / -1; }
   .qty-cell { width: 100%; }
 }
-@media (max-width: 760px) {
+@media (max-width: 760px), (pointer: coarse) and (max-height: 540px) {
   .report-toolbar .segmented { width: 100%; overflow-x: auto; flex-wrap: nowrap; }
   .report-toolbar .segmented button { white-space: nowrap; font-size: 12.5px; padding-inline: 12px; }
   .report-toolbar > button { width: 100%; }
 }
 
 /* Inventario en el celular: los zapatos primero. Resumen y filtros se deslizan de lado. */
-@media (max-width: 760px) {
+@media (max-width: 760px), (pointer: coarse) and (max-height: 540px) {
   .inventory-suite { margin-bottom: 10px; }
   .inventory-summary { display: flex !important; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; scrollbar-width: none; }
   .inventory-summary::-webkit-scrollbar, .inventory-filter-list::-webkit-scrollbar { display: none; }
@@ -164,7 +164,7 @@
   .toolbar.tools-collapsed > [data-mobile-secondary] { display: none; }
 }
 .mobile-tools-toggle { display: none; }
-@media (max-width: 760px) { .mobile-tools-toggle { display: inline-flex; align-items: center; justify-content: center; } }
+@media (max-width: 760px), (pointer: coarse) and (max-height: 540px) { .mobile-tools-toggle { display: inline-flex; align-items: center; justify-content: center; } }
 .install-strip { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 10px 12px; border-radius: 16px; border: 1px solid rgba(58, 160, 255, .35);
   background: linear-gradient(135deg, rgba(13, 91, 255, .25), rgba(6, 18, 46, .7)); }
 .install-strip > span:nth-child(2) { flex: 1; display: grid; gap: 2px; font-size: 13px; }
@@ -173,3 +173,37 @@
 .install-strip .primary { min-height: 38px; padding: 0 14px; }
 .install-strip .ghost { min-height: 38px; padding: 0 8px; }
 .sync-note { margin: 14px 0 0; padding: 10px 12px; border-radius: 12px; background: rgba(31, 124, 255, .1); border: 1px solid rgba(58, 160, 255, .25); color: #cfe2ff; font-size: 12.5px; }
+
+/* ---------- Pantallas táctiles (celular y tableta): botones cómodos para el dedo ---------- */
+@media (pointer: coarse) {
+  button, .button, select, input:not([type=checkbox]):not([type=radio]), textarea { min-height: 46px; }
+  input, select, textarea { font-size: 16px !important; }
+  .primary, .secondary, .danger, .ghost, .button { padding-inline: 16px; border-radius: 13px; font-size: 14px; font-weight: 700; }
+  .form-actions { gap: 10px; }
+  .form-actions > button, .form-actions > .button { min-height: 50px; }
+  .toolbar { gap: 10px; }
+  #mainNav button { min-height: 48px; }
+  .size-chip { min-width: 52px; height: 48px; font-size: 13px; border-radius: 12px; }
+  .icon-button, .modal-close, .drawer-close { min-width: 44px; min-height: 44px; }
+  .round-button, .command-button { min-width: 46px; height: 46px; }
+  .segmented button, .inventory-filter-button { min-height: 42px; padding-inline: 14px; font-size: 13px; }
+  .check-row { min-height: 46px; gap: 12px; }
+  .check-row input[type=checkbox], .day-picker input { width: 22px; height: 22px; }
+  .data-table button, .link-button { min-height: 40px; padding: 0 12px; }
+  .cart-line input { min-height: 44px; }
+  .tab-bar button { min-height: 56px; font-size: 11px; }
+  .tab-bar button i { font-size: 21px; }
+  .more-item { min-height: 56px; }
+  /* Sin «hover» pegado después de tocar */
+  .product-card:hover, .business-card:hover, .catalog-card:hover, .quick-card:hover, .metric-card:hover { box-shadow: none; }
+  .primary:hover::after { transform: translateX(-130%); }
+  button:active, .button:active, .size-chip:active { transform: scale(.96); filter: brightness(1.15); }
+}
+/* Celular en horizontal: barra inferior más baja para dejar espacio al contenido */
+@media (pointer: coarse) and (max-height: 540px) {
+  .tab-bar { padding-top: 3px; padding-bottom: calc(3px + env(safe-area-inset-bottom)); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+  .tab-bar button { min-height: 44px; grid-auto-flow: column; gap: 6px; align-items: center; justify-content: center; }
+  .workspace { padding-bottom: calc(64px + env(safe-area-inset-bottom)); padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
+  .modal-panel { max-height: 96dvh; }
+  .topbar { min-height: 52px; }
+}
