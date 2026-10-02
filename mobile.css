@@ -144,3 +144,32 @@
   .report-toolbar .segmented button { white-space: nowrap; font-size: 12.5px; padding-inline: 12px; }
   .report-toolbar > button { width: 100%; }
 }
+
+/* Inventario en el celular: los zapatos primero. Resumen y filtros se deslizan de lado. */
+@media (max-width: 760px) {
+  .inventory-suite { margin-bottom: 10px; }
+  .inventory-summary { display: flex !important; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; scrollbar-width: none; }
+  .inventory-summary::-webkit-scrollbar, .inventory-filter-list::-webkit-scrollbar { display: none; }
+  .inventory-metric { flex: 0 0 138px; scroll-snap-align: start; padding: 9px 11px !important; }
+  .inventory-metric strong { font-size: 18px; margin: 3px 0 0; }
+  .inventory-metric span { display: none; }
+  .inventory-controls { grid-template-columns: 1fr !important; padding: 9px !important; }
+  .inventory-filter-list { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; }
+  .inventory-filter-button { width: auto !important; min-height: 38px; }
+  .inventory-filter-button { flex: none; }
+  .inventory-tools { display: grid !important; grid-template-columns: 1fr 1fr; }
+  .inventory-tools .inventory-export { grid-column: 1 / -1; }
+  /* Herramientas secundarias plegadas */
+  .mobile-tools-toggle { flex: 1 1 calc(50% - 8px); }
+  .toolbar.tools-collapsed > [data-mobile-secondary] { display: none; }
+}
+.mobile-tools-toggle { display: none; }
+@media (max-width: 760px) { .mobile-tools-toggle { display: inline-flex; align-items: center; justify-content: center; } }
+.install-strip { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 10px 12px; border-radius: 16px; border: 1px solid rgba(58, 160, 255, .35);
+  background: linear-gradient(135deg, rgba(13, 91, 255, .25), rgba(6, 18, 46, .7)); }
+.install-strip > span:nth-child(2) { flex: 1; display: grid; gap: 2px; font-size: 13px; }
+.install-strip small { color: #a9c3e8; font-size: 11px; }
+.install-icon { font-size: 22px; }
+.install-strip .primary { min-height: 38px; padding: 0 14px; }
+.install-strip .ghost { min-height: 38px; padding: 0 8px; }
+.sync-note { margin: 14px 0 0; padding: 10px 12px; border-radius: 12px; background: rgba(31, 124, 255, .1); border: 1px solid rgba(58, 160, 255, .25); color: #cfe2ff; font-size: 12.5px; }
