@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="ws-build" content="0.5.4-muzsww8t">
+  <meta name="theme-color" content="#f4f6fb">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://apis.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.googleusercontent.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://*.run.app; frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://apis.google.com; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="WannaShop">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="description" content="WannaShop, sistema de inventario: gestiona tu inventario de forma fácil, rápida y organizada.">
+  <meta property="og:title" content="WannaShop · Sistema de inventario">
+  <meta property="og:description" content="Inventario por tallas, ventas, despachos, cobros y reportes, desde el celular o el computador.">
+  <meta property="og:image" content="https://wanna033.github.io/wannashop/assets/og-banner.jpg">
+  <meta property="og:url" content="https://wanna033.github.io/wannashop/">
+  <meta property="og:type" content="website">
+  <title>WannaShop · Inventario de bodega</title>
+  <link rel="stylesheet" href="premium.light.css?v=0.5.4-muzsww8t" data-light="premium.light.css?v=0.5.4-muzsww8t" data-dark="premium.css?v=0.5.4-muzsww8t">
+  <link rel="stylesheet" href="web.light.css?v=0.5.4-muzsww8t" data-light="web.light.css?v=0.5.4-muzsww8t" data-dark="web.css?v=0.5.4-muzsww8t">
+  <link rel="stylesheet" href="mobile.light.css?v=0.5.4-muzsww8t" data-light="mobile.light.css?v=0.5.4-muzsww8t" data-dark="mobile.css?v=0.5.4-muzsww8t">
+  <link rel="stylesheet" href="brand.light.css?v=0.5.4-muzsww8t" data-light="brand.light.css?v=0.5.4-muzsww8t" data-dark="brand.css?v=0.5.4-muzsww8t">
+  <link rel="stylesheet" href="motion.light.css?v=0.5.4-muzsww8t" data-light="motion.light.css?v=0.5.4-muzsww8t" data-dark="motion.css?v=0.5.4-muzsww8t">
+  <link rel="stylesheet" href="theme-light.css?v=0.5.4-muzsww8t" data-light-only>
+  <script src="theme.js?v=0.5.4-muzsww8t"></script>
+  <link rel="modulepreload" href="js/api.js?v=0.5.4-muzsww8t">
+  <link rel="modulepreload" href="js/chunks/backend-firebase-CDLANDUX.js">
+  <link rel="modulepreload" href="js/chunks/chunk-AAHVMZQ4.js">
+  <link rel="modulepreload" href="js/chunks/chunk-DOTI2Y6D.js">
+  <link rel="modulepreload" href="js/chunks/chunk-NU3DUPOA.js">
+  <link rel="modulepreload" href="js/chunks/chunk-PHKIAKHS.js">
+</head>
+<body>
+  <div id="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div id="bootScreen" class="boot-screen" role="status" aria-live="polite">
+    <div class="boot-card">
+      <div class="boot-logo"><img src="assets/wannashop-logo.png" alt="WannaShop"></div>
+      <div class="boot-wordmark">WannaShop</div>
+      <div class="boot-subtitle">Inventario de bodega</div>
+      <div class="boot-progress" aria-hidden="true"><span></span></div>
+      <div class="boot-status">Preparando tu operación…</div>
+    </div>
+  </div>
+  <section id="authRoot" class="auth-root" aria-live="polite"></section>
+
+  <div id="shell" class="shell hidden">
+    <aside class="sidebar">
+      <div class="brand-block">
+        <span class="brand-logo"><img src="assets/wannashop-logo.png" alt=""></span>
+        <span><strong id="brandName">WannaShop</strong><small>Inventario de bodega</small></span>
+        <span class="edition-pill">PRO</span>
+      </div>
+
+      <nav id="mainNav" aria-label="Navegación principal">
+        <p class="nav-label">Inicio</p>
+        <button data-view="dashboard"><span class="nav-icon">⌂</span><span>Centro de control</span></button>
+
+        <p class="nav-label">Operación</p>
+        <button data-view="inventory"><span class="nav-icon">▦</span><span>Inventario</span></button>
+        <button data-view="sale"><span class="nav-icon">◇</span><span>Venta rápida</span></button>
+        <button data-view="drafts"><span class="nav-icon">◌</span><span>Facturas abiertas</span><span class="nav-count hidden" id="draftCount"></span></button>
+        <button data-view="businesses"><span class="nav-icon">▤</span><span>Negocios asociados</span></button>
+
+        <p class="nav-label">Finanzas</p>
+        <button data-view="accounts"><span class="nav-icon">◎</span><span>Cobros y saldos</span><span class="nav-count hidden" id="debtCount"></span></button>
+        <button data-view="cash"><span class="nav-icon">◫</span><span>Caja del día</span></button>
+        <button data-view="invoices"><span class="nav-icon">▧</span><span>Facturas</span></button>
+        <button data-view="returns"><span class="nav-icon">↩</span><span>Devoluciones</span></button>
+        <button data-view="consolidated"><span class="nav-icon">Σ</span><span>Consolidado</span></button>
+
+        <div data-admin-block>
+          <p class="nav-label">Administración privada</p>
+          <button data-view="settings"><span class="nav-icon">⚙</span><span>Configuración</span></button>
+          <button data-view="purchases"><span class="nav-icon">⇣</span><span>Compras</span></button>
+          <button data-view="expenses"><span class="nav-icon">⇡</span><span>Gastos</span></button>
+          <button data-view="suppliers"><span class="nav-icon">♧</span><span>Proveedores</span></button>
+          <button data-view="customers"><span class="nav-icon">♙</span><span>Clientes</span></button>
+          <button data-view="reports"><span class="nav-icon">↗</span><span>Rentabilidad</span></button>
+          <button data-view="history"><span class="nav-icon">≡</span><span>Historial</span></button>
+        </div>
+      </nav>
+
+      <div class="sidebar-foot">
+        <button class="protection-card" data-action="openProtection">
+          <span class="status-orb" id="protectionOrb"></span>
+          <span><b id="protectionTitle">Protección activa</b><small id="protectionText">Copia local verificada</small></span>
+          <span>›</span>
+        </button>
+        <button class="user-card" data-action="userMenu">
+          <span class="user-avatar" id="userAvatar">W</span>
+          <span><b id="userName">Usuario</b><small id="userRole">Operador</small></span>
+          <span>•••</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div class="page-heading"><p id="pageEyebrow">WANNASHOP · OPERACIÓN</p><h1 id="pageTitle">Centro de control</h1></div>
+        <div class="top-actions">
+          <button class="command-button" data-action="openPalette" aria-label="Buscar y ejecutar acciones"><span>⌕</span><span>Buscar o ejecutar</span><kbd>Ctrl K</kbd></button>
+          <span id="schedulePill" class="schedule-pill"></span>
+          <button class="round-button" data-action="quickCreate" aria-label="Crear nuevo">＋</button>
+        </div>
+      </header>
+      <div id="contextBar" class="context-bar hidden"></div>
+      <section id="app" class="content" tabindex="-1"></section>
+    </main>
+  </div>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-panel"><button class="modal-close" data-action="closeModal" aria-label="Cerrar">×</button><div id="modalBody"></div></div></div>
+  <aside id="drawer" class="drawer hidden" aria-label="Detalle"><button class="drawer-close" data-action="closeDrawer" aria-label="Cerrar">×</button><div id="drawerBody"></div></aside>
+  <div id="palette" class="palette hidden" role="dialog" aria-modal="true" aria-label="Buscador"><div class="palette-box"><div class="palette-search"><span>⌕</span><input id="paletteInput" placeholder="Busca un producto, negocio, factura o acción…" autocomplete="off"><kbd>Esc</kbd></div><div id="paletteResults" class="palette-results"></div></div></div>
+  <div id="toastStack" class="toast-stack" aria-live="polite"></div>
+
+  <script src="rules.js?v=0.5.4-muzsww8t"></script>
+  <script src="ui-core.js?v=0.5.4-muzsww8t"></script>
+  <script src="ui-views.js?v=0.5.4-muzsww8t"></script>
+  <script src="ui-actions.js?v=0.5.4-muzsww8t"></script>
+  <script src="ui-admin.js?v=0.5.4-muzsww8t"></script>
+  <script src="ui-finance.js?v=0.5.4-muzsww8t"></script>
+  <script src="ui-web.js?v=0.5.4-muzsww8t"></script>
+  <script src="ui-mobile.js?v=0.5.4-muzsww8t"></script>
+  <script src="ui-pro.js?v=0.5.4-muzsww8t"></script>
+  <script src="ui-kardex.js?v=0.5.4-muzsww8t"></script>
+  <script src="ui-restock.js?v=0.5.4-muzsww8t"></script>
+  <script src="ui-tour.js?v=0.5.4-muzsww8t"></script>
+  <script src="ui-motion.js?v=0.5.4-muzsww8t"></script>
+  <script src="ui-billing.js?v=0.5.4-muzsww8t"></script>
+  <script src="ui-security.js?v=0.5.4-muzsww8t"></script>
+  <script type="module" src="js/api.js?v=0.5.4-muzsww8t"></script>
+</body>
+</html>

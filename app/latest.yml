@@ -1,0 +1,8 @@
+version: 0.5.4
+files:
+  - url: WannaShop-Setup.exe
+    sha512: ZXgqXYadP1UO+M+YxrLxiE2Eo/smmPZ+uXefRFAMVrAXFXp05ETvrSbj8MwHohPdvk6GaA15FnobmQ0L242VaA==
+    size: 94065859
+path: WannaShop-Setup.exe
+sha512: ZXgqXYadP1UO+M+YxrLxiE2Eo/smmPZ+uXefRFAMVrAXFXp05ETvrSbj8MwHohPdvk6GaA15FnobmQ0L242VaA==
+releaseDate: '2026-10-08T17:19:20.181Z'

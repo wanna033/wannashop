@@ -1,0 +1,104 @@
+/* Identidad WannaShop: los colores del logo (azul eléctrico sobre azul marino) en toda la página web.
+   Se carga al final y solo cambia colores, fondos y la pantalla de entrada; la estructura es la misma. */
+:root {
+  --brand-950: #030817; --brand-900: #061230; --brand-800: #0a1d4a; --brand-700: #0b3fae;
+  --brand-600: #0d5bff; --brand-500: #1f7cff; --brand-400: #3aa0ff; --brand-300: #7cc4ff;
+  --bg-0: var(--brand-950); --bg-1: var(--brand-900);
+  --surface: rgba(10, 24, 58, .66); --surface-strong: rgba(10, 26, 64, .94); --surface-soft: rgba(80, 140, 255, .06);
+  --line: rgba(110, 160, 255, .14); --line-strong: rgba(90, 160, 255, .38);
+  --text-2: #c4d2ea; --muted: #8193b4; --accent: var(--brand-400); --accent-2: var(--brand-500);
+}
+html, body { background: var(--brand-950); }
+
+/* Fondo con el brillo azul del logo */
+#ambient { background: radial-gradient(circle at 82% -12%, rgba(31, 124, 255, .22), transparent 42%), radial-gradient(circle at 8% 108%, rgba(13, 91, 255, .16), transparent 40%), linear-gradient(155deg, #030817, #06122e 55%, #030817); }
+#ambient i { background: #1f7cff !important; opacity: .12; }
+
+/* Marco: menú lateral, encabezado y marca */
+.sidebar { background: rgba(4, 11, 30, .86); border-right-color: rgba(110, 160, 255, .12); }
+.topbar { background: linear-gradient(to bottom, rgba(3, 8, 23, .96) 62%, rgba(3, 8, 23, 0)); }
+.brand-logo { background: linear-gradient(145deg, #3aa0ff, #0b3fae); box-shadow: 0 8px 26px rgba(13, 91, 255, .35); border-radius: 14px; }
+.brand-logo img { border-radius: 12px; }
+.edition-pill { color: #cfe6ff; border-color: rgba(58, 160, 255, .45); background: rgba(31, 124, 255, .18); }
+#mainNav button:hover { background: rgba(31, 124, 255, .08); }
+#mainNav button.active { background: linear-gradient(100deg, rgba(31, 124, 255, .32), rgba(31, 124, 255, .06)); box-shadow: inset 0 0 0 1px rgba(58, 160, 255, .28), inset 3px 0 0 #3aa0ff; color: #fff; }
+.nav-badge { background: rgba(31, 124, 255, .2); color: #a9d4ff; }
+.user-card, .protection-card { border-color: rgba(110, 160, 255, .14); }
+.hero-logo { border-radius: 26px; box-shadow: 0 20px 55px rgba(13, 91, 255, .35), 0 0 0 6px rgba(58, 160, 255, .12); }
+
+/* Botones */
+.primary, button.primary, .button.primary { background: linear-gradient(135deg, #0d5bff, #2d9bff); border-color: rgba(124, 196, 255, .5); color: #fff; box-shadow: 0 8px 22px rgba(13, 91, 255, .38); }
+.primary:hover { filter: brightness(1.1); }
+.primary:disabled { filter: grayscale(.4) brightness(.8); box-shadow: none; }
+.secondary { background: rgba(80, 140, 255, .08); border-color: rgba(110, 160, 255, .2); color: #dbe8ff; }
+.secondary:hover { background: rgba(80, 140, 255, .14); }
+.round-button { background: linear-gradient(145deg, rgba(31, 124, 255, .38), rgba(13, 91, 255, .14)); border-color: rgba(58, 160, 255, .4); color: #fff; }
+.command-button, .schedule-pill { border-color: rgba(110, 160, 255, .16); background: rgba(31, 124, 255, .07); }
+.google-button.primary, .button.google-button { background: #fff; color: #1f2937; border-color: #fff; box-shadow: 0 8px 22px rgba(0, 0, 0, .3); }
+
+/* Tarjetas, paneles y datos */
+.panel, .business-card { background: rgba(9, 22, 54, .62); }
+.hero { border-color: rgba(58, 160, 255, .25); background: radial-gradient(circle at 92% 0%, rgba(31, 124, 255, .35), transparent 45%), linear-gradient(120deg, rgba(10, 29, 74, .95), rgba(6, 18, 46, .85) 58%, rgba(8, 22, 58, .9)); box-shadow: 0 24px 60px rgba(0, 0, 0, .3); }
+.metric-card { border-color: rgba(110, 160, 255, .13); }
+.metric-card.good::after, .metric-card::after { background: radial-gradient(circle, rgba(31, 124, 255, .25), transparent 70%); }
+.product-card, .catalog-card { border-color: rgba(110, 160, 255, .13); }
+.product-card:hover, .business-card:hover { border-color: rgba(58, 160, 255, .45); }
+.size-chip:hover { border-color: rgba(58, 160, 255, .6); background: rgba(31, 124, 255, .14); }
+.badge { background: rgba(31, 124, 255, .14); color: #a9d4ff; border-color: rgba(58, 160, 255, .25); }
+.segmented button.active { background: linear-gradient(135deg, #0d5bff, #2d9bff); color: #fff; }
+.bar { background: linear-gradient(to top, #0d5bff, #3aa0ff); }
+.bar.today { background: linear-gradient(to top, #1f7cff, #9fd6ff); }
+.data-table td { color: #cbd8ee; }
+.modal-panel { background: rgba(7, 17, 44, .97); border-color: rgba(110, 160, 255, .2); }
+.drawer { background: rgba(6, 15, 40, .97); border-left-color: rgba(110, 160, 255, .2); }
+.toast { background: rgba(7, 17, 44, .96); border-color: rgba(110, 160, 255, .2); }
+.palette-box { background: rgba(7, 17, 44, .98); border-color: rgba(110, 160, 255, .22); }
+.field input:focus, .field select:focus, .field textarea:focus, .search-field input:focus, #saleSearch:focus { outline: none; border-color: #3aa0ff; box-shadow: 0 0 0 3px rgba(58, 160, 255, .22); }
+
+/* Celular: barra inferior y carrito */
+.tab-bar { background: rgba(3, 8, 23, .95); border-top-color: rgba(110, 160, 255, .16); }
+.tab-bar button.active { color: #fff; background: rgba(31, 124, 255, .16); }
+.tab-bar .tab-main i { background: linear-gradient(135deg, #0d5bff, #2d9bff); color: #fff; box-shadow: 0 6px 16px rgba(13, 91, 255, .45); }
+.cart-fab { background: linear-gradient(135deg, #0d5bff, #2d9bff); color: #fff; box-shadow: 0 14px 34px rgba(13, 91, 255, .45); }
+.more-item.active, .onboarding-step:hover, .tour-chapter:hover, .business-choice:hover { border-color: rgba(58, 160, 255, .55); background: rgba(31, 124, 255, .1); }
+.onboarding { border-color: rgba(58, 160, 255, .35); }
+.tour-actions .primary { background: linear-gradient(135deg, #0d5bff, #2d9bff); border-color: #0d5bff; }
+.tour-dots i.on { background: #0d5bff; }
+.tour-spot { box-shadow: 0 0 0 9999px rgba(2, 6, 18, .74), 0 0 0 3px #3aa0ff, 0 0 26px rgba(58, 160, 255, .6); }
+.tour.no-target { background: rgba(2, 6, 18, .74); }
+.web-banner { background: rgba(9, 30, 80, .96); border-color: rgba(58, 160, 255, .45); }
+
+/* Pantalla de carga: el banner de WannaShop con la barra de progreso */
+.boot-screen { background: #030817 url(assets/login-banner.webp) center / cover no-repeat; place-items: end center; }
+.boot-logo, .boot-wordmark, .boot-subtitle { display: none; }
+.boot-card { min-width: 0; margin-bottom: 7vh; padding: 14px 24px 12px; border-radius: 18px; background: rgba(3, 8, 23, .78); border: 1px solid rgba(58, 160, 255, .3); backdrop-filter: blur(10px); }
+.boot-progress { margin: 0 auto 8px; background: rgba(58, 160, 255, .18); }
+.boot-progress span { background: linear-gradient(90deg, #0d5bff, #7cc4ff); }
+.boot-status { color: #dbe8ff; }
+@media (max-width: 760px), (pointer: coarse) and (max-height: 540px) { .boot-screen { background-position: 22% center; } }
+
+/* Inicio de sesión: banner a la izquierda (arriba en el celular) y la tarjeta para entrar */
+.auth-root.auth-split { padding: 0; display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(360px, 1fr); place-items: stretch; overflow: auto; }
+.auth-hero { position: relative; overflow: hidden; background: #061230; min-height: 100%; }
+.auth-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 18% center; display: block; }
+.auth-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 72%, rgba(3, 8, 23, .92)); pointer-events: none; }
+.auth-side { display: grid; place-items: center; padding: 28px 22px; background: radial-gradient(circle at 75% 8%, rgba(31, 124, 255, .22), transparent 48%), #030817; overflow: auto; }
+.auth-split .auth-card { width: min(420px, 100%); background: rgba(8, 20, 50, .8); border-color: rgba(110, 160, 255, .22); box-shadow: 0 30px 80px rgba(0, 0, 0, .5), 0 0 0 1px rgba(58, 160, 255, .08); }
+.auth-split .auth-brand img { width: 72px; height: 72px; border-radius: 20px; box-shadow: 0 14px 36px rgba(13, 91, 255, .35); }
+.auth-split .auth-brand h1 { color: #fff; }
+.auth-lead { margin: -8px 0 18px; text-align: center; color: #b8c8e6; font-size: 14px; line-height: 1.5; }
+@media (max-width: 900px) {
+  /* Celular y tableta: banner arriba con su propia altura y la tarjeta debajo (la página se desplaza). */
+  .auth-root.auth-split { display: block; height: 100%; overflow: auto; }
+  .auth-hero { min-height: 0; height: auto; }
+  .auth-hero img { position: static; width: 100%; height: auto; }
+  .auth-hero::after { background: linear-gradient(180deg, transparent 70%, #030817); }
+  .auth-side { display: grid; place-items: start center; padding: 0 14px calc(24px + env(safe-area-inset-bottom)); background: #030817; overflow: visible; }
+  .auth-split .auth-card { margin-top: 10px; position: relative; z-index: 1; }
+}
+@media (max-width: 520px) {
+  /* Celular: el banner se recorta por la izquierda para que el logo y la bienvenida se vean grandes. */
+  .auth-hero { height: min(62vw, 44vh); }
+  .auth-hero img { position: absolute; inset: 0; height: 100%; object-fit: cover; object-position: left center; }
+  .auth-split .auth-card { margin-top: -24px; }
+}
